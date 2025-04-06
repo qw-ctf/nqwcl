@@ -852,26 +852,6 @@ void SCR_RSShot_f (void)
 
 	Con_Printf("Remote screen shot requested.\n");
 
-#if 0
-// 
-// find a file name to save it to 
-// 
-	strcpy(pcxname,"mquake00.pcx");
-		
-	for (i=0 ; i<=99 ; i++) 
-	{ 
-		pcxname[6] = i/10 + '0'; 
-		pcxname[7] = i%10 + '0'; 
-		sprintf (checkname, "%s/%s", com_gamedir, pcxname);
-		if (Sys_FileTime(checkname) == -1)
-			break;	// file doesn't exist
-	} 
-	if (i==100) 
-	{
-		Con_Printf ("SCR_ScreenShot_f: Couldn't create a PCX"); 
-		return;
-	}
-#endif
  
 // 
 // save the pcx file 

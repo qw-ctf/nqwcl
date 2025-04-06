@@ -718,16 +718,6 @@ void DrawSkyPolygon (int nump, vec3_t vecs)
 	float	*vp;
 
 	c_sky++;
-#if 0
-glBegin (GL_POLYGON);
-for (i=0 ; i<nump ; i++, vecs+=3)
-{
-	VectorAdd(vecs, r_origin, v);
-	glVertex3fv (v);
-}
-glEnd();
-return;
-#endif
 	// decide which face it maps to
 	VectorCopy (vec3_origin, v);
 	for (i=0, vp=vecs ; i<nump ; i++, vp+=3)
@@ -980,12 +970,6 @@ void R_DrawSkyBox (void)
 	vec3_t	v;
 	float	s, t;
 
-#if 0
-glEnable (GL_BLEND);
-glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-glColor4f (1,1,1,0.5);
-glDisable (GL_DEPTH_TEST);
-#endif
 	for (i=0 ; i<6 ; i++)
 	{
 		if (skymins[0][i] >= skymaxs[0][i]
@@ -993,12 +977,6 @@ glDisable (GL_DEPTH_TEST);
 			continue;
 
 		GL_Bind (SKY_TEX+skytexorder[i]);
-#if 0
-skymins[0][i] = -1;
-skymins[1][i] = -1;
-skymaxs[0][i] = 1;
-skymaxs[1][i] = 1;
-#endif
 		glBegin (GL_QUADS);
 		MakeSkyVec (skymins[0][i], skymins[1][i], i);
 		MakeSkyVec (skymins[0][i], skymaxs[1][i], i);
@@ -1006,12 +984,6 @@ skymaxs[1][i] = 1;
 		MakeSkyVec (skymaxs[0][i], skymins[1][i], i);
 		glEnd ();
 	}
-#if 0
-glDisable (GL_BLEND);
-glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-glColor4f (1,1,1,0.5);
-glEnable (GL_DEPTH_TEST);
-#endif
 }
 
 

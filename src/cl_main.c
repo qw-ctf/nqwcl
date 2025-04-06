@@ -914,14 +914,6 @@ void CL_ConnectionlessPacket (void)
 		return;
 	}
 
-#if 0
-	if (c == svc_disconnect) {
-		Con_Printf ("disconnect\n");
-
-		Host_EndGame ("Server disconnected");
-		return;
-	}
-#endif
 
 	Con_Printf ("unknown:  %c\n", c);
 }
@@ -1264,31 +1256,6 @@ void Host_WriteConfiguration (void)
 
 //============================================================================
 
-#if 0
-/*
-==================
-Host_SimulationTime
-
-This determines if enough time has passed to run a simulation frame
-==================
-*/
-qboolean Host_SimulationTime(float time)
-{
-	float fps;
-
-	if (oldrealtime > realtime)
-		oldrealtime = 0;
-
-	if (cl_maxfps.value)
-		fps = max(30.0, min(cl_maxfps.value, 72.0));
-	else
-		fps = max(30.0, min(rate.value/80.0, 72.0));
-
-	if (!cls.timedemo && (realtime + time) - oldrealtime < 1.0/fps)
-		return false;			// framerate is too high
-	return true;
-}
-#endif
 
 
 /*

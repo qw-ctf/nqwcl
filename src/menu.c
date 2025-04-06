@@ -481,12 +481,6 @@ void M_DrawSlider (int x, int y, float range)
 
 void M_DrawCheckbox (int x, int y, int on)
 {
-#if 0
-	if (on)
-		M_DrawCharacter (x, y, 131);
-	else
-		M_DrawCharacter (x, y, 129);
-#endif
 	if (on)
 		M_Print (x, y, "on");
 	else
@@ -1089,7 +1083,6 @@ void M_Quit_Draw (void)
 		M_Draw ();
 		m_state = m_quit;
 	}
-#if 1
 	M_DrawTextBox (0, 0, 38, 23);
 	y = 12;
 	for (p = cmsg; *p; p++, y += 8) {
@@ -1098,13 +1091,6 @@ void M_Quit_Draw (void)
 		else
 			M_Print (16, y,	*p + 1);
 	}
-#else
-	M_DrawTextBox (56, 76, 24, 4);
-	M_Print (64, 84,  quitMessage[msgNumber*4+0]);
-	M_Print (64, 92,  quitMessage[msgNumber*4+1]);
-	M_Print (64, 100, quitMessage[msgNumber*4+2]);
-	M_Print (64, 108, quitMessage[msgNumber*4+3]);
-#endif
 }
 
 
