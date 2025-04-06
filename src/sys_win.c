@@ -158,7 +158,6 @@ void Sys_Init (void)
 	unsigned int	lowpart, highpart;
 	OSVERSIONINFO	vinfo;
 
-#ifndef SERVERONLY
 	// allocate a named semaphore on the client so the
 	// front end can tell if it is alive
 
@@ -176,7 +175,6 @@ void Sys_Init (void)
         0,            /* Initial count       */
         1,            /* Maximum count       */
         "qwcl"); /* Semaphore name      */
-#endif
 
 	//MaskExceptions ();
 	//Sys_SetFPCW ();
@@ -240,9 +238,7 @@ void Sys_Error (char *error, ...)
 
 	MessageBox(NULL, text, "Error", 0 /* MB_OK */ );
 
-#ifndef SERVERONLY
 	CloseHandle (qwclsemaphore);
-#endif
 
 	exit (1);
 }
@@ -263,13 +259,11 @@ void Sys_Quit (void)
 	VID_ForceUnlockedAndReturnState ();
 
 	Host_Shutdown();
-#ifndef SERVERONLY
 	if (tevent)
 		CloseHandle (tevent);
 
 	if (qwclsemaphore)
 		CloseHandle (qwclsemaphore);
-#endif
 
 	exit (0);
 }

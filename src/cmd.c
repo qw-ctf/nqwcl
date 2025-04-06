@@ -595,7 +595,6 @@ char *Cmd_CompleteCommand (char *partial)
 	return NULL;
 }
 
-#ifndef SERVERONLY		// FIXME
 /*
 ===================
 Cmd_ForwardToServer
@@ -648,11 +647,6 @@ void Cmd_ForwardToServer_f (void)
 		SZ_Print (&cls.netchan.message, Cmd_Args());
 	}
 }
-#else
-void Cmd_ForwardToServer (void)
-{
-}
-#endif
 
 /*
 ============
@@ -741,8 +735,6 @@ void Cmd_Init (void)
 	Cmd_AddCommand ("echo",Cmd_Echo_f);
 	Cmd_AddCommand ("alias",Cmd_Alias_f);
 	Cmd_AddCommand ("wait", Cmd_Wait_f);
-#ifndef SERVERONLY
 	Cmd_AddCommand ("cmd", Cmd_ForwardToServer_f);
-#endif
 }
 

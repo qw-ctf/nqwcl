@@ -21,11 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <ctype.h>
 
-#ifdef SERVERONLY 
-#include "qwsvdef.h"
-#else
 #include "quakedef.h"
-#endif
 
 #define MAX_NUM_ARGVS	50
 #define NUM_SAFE_ARGVS	6
@@ -1120,11 +1116,9 @@ void COM_CheckRegistered (void)
 	if (!h)
 	{
 		Con_Printf ("Playing shareware version.\n");
-#ifndef SERVERONLY
 // FIXME DEBUG -- only temporary
 		if (com_modified)
 			Sys_Error ("You must have the registered version to play QuakeWorld");
-#endif
 		return;
 	}
 
@@ -1587,14 +1581,10 @@ byte *COM_LoadFile (char *path, int usehunk)
 		Sys_Error ("COM_LoadFile: not enough space for %s", path);
 		
 	((byte *)buf)[len] = 0;
-#ifndef SERVERONLY
 	Draw_BeginDisc ();
-#endif
 	fread (buf, 1, len, h);
 	fclose (h);
-#ifndef SERVERONLY
 	Draw_EndDisc ();
-#endif
 
 	return buf;
 }
@@ -2008,9 +1998,6 @@ void Info_SetValueForStarKey (char *s, char *key, char *value, int maxsize)
 {
 	char	new[1024], *v;
 	int		c;
-#ifdef SERVERONLY
-	extern cvar_t sv_highchars;
-#endif
 
 	if (strstr (key, "\\") || strstr (value, "\\") )
 	{
@@ -2057,7 +2044,6 @@ void Info_SetValueForStarKey (char *s, char *key, char *value, int maxsize)
 	while (*v)
 	{
 		c = (unsigned char)*v++;
-#ifndef SERVERONLY
 		// client only allows highbits on name
 		if (stricmp(key, "name") != 0) {
 			c &= 127;
@@ -2067,13 +2053,6 @@ void Info_SetValueForStarKey (char *s, char *key, char *value, int maxsize)
 			if (stricmp(key, "team") == 0)
 				c = tolower(c);
 		}
-#else
-		if (!sv_highchars.value) {
-			c &= 127;
-			if (c < 32 || c > 127)
-				continue;
-		}
-#endif
 //		c &= 127;		// strip high bits
 		if (c > 13) // && c < 127)
 			*s++ = c;

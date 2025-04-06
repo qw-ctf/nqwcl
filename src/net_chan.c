@@ -125,9 +125,7 @@ void Netchan_OutOfBand (netadr_t adr, int length, byte *data)
 
 // send the datagram
 	//zoid, no input in demo playback mode
-#ifndef SERVERONLY
 	if (!cls.demoplayback)
-#endif
 		NET_SendPacket (send.cursize, send.data, adr);
 }
 
@@ -206,9 +204,6 @@ qboolean Netchan_CanReliable (netchan_t *chan)
 	return Netchan_CanPacket (chan);
 }
 
-#ifdef SERVERONLY
-qboolean ServerPaused(void);
-#endif
 
 /*
 ===============
@@ -268,9 +263,7 @@ void Netchan_Transmit (netchan_t *chan, int length, byte *data)
 	MSG_WriteLong (&send, w2);
 
 	// send the qport if we are a client
-#ifndef SERVERONLY
 	MSG_WriteShort (&send, cls.qport);
-#endif
 
 // copy the reliable message to the packet first
 	if (send_reliable)
@@ -289,19 +282,13 @@ void Netchan_Transmit (netchan_t *chan, int length, byte *data)
 	chan->outgoing_time[i] = realtime;
 
 	//zoid, no input in demo playback mode
-#ifndef SERVERONLY
 	if (!cls.demoplayback)
-#endif
 		NET_SendPacket (send.cursize, send.data, chan->remote_address);
 
 	if (chan->cleartime < realtime)
 		chan->cleartime = realtime + send.cursize*chan->rate;
 	else
 		chan->cleartime += send.cursize*chan->rate;
-#ifdef SERVERONLY
-	if (ServerPaused())
-		chan->cleartime = realtime;
-#endif
 
 	if (showpackets.value)
 		Con_Printf ("--> s=%i(%i) a=%i(%i) %i\n"
@@ -325,15 +312,10 @@ qboolean Netchan_Process (netchan_t *chan)
 {
 	unsigned		sequence, sequence_ack;
 	unsigned		reliable_ack, reliable_message;
-#ifdef SERVERONLY
-	int			qport;
-#endif
 	int i;
 
 	if (
-#ifndef SERVERONLY
 			!cls.demoplayback && 
-#endif
 			!NET_CompareAdr (net_from, chan->remote_address))
 		return false;
 	
@@ -343,9 +325,6 @@ qboolean Netchan_Process (netchan_t *chan)
 	sequence_ack = MSG_ReadLong ();
 
 	// read the qport if we are a server
-#ifdef SERVERONLY
-	qport = MSG_ReadShort ();
-#endif
 
 	reliable_message = sequence >> 31;
 	reliable_ack = sequence_ack >> 31;

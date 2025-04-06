@@ -19,11 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cvar.c -- dynamic variable tracking
 
-#ifdef SERVERONLY 
-#include "qwsvdef.h"
-#else
 #include "quakedef.h"
-#endif
 
 cvar_t	*cvar_vars;
 char	*cvar_null_string = "";
@@ -105,9 +101,6 @@ char *Cvar_CompleteVariable (char *partial)
 }
 
 
-#ifdef SERVERONLY
-void SV_SendServerInfoChange(char *key, char *value);
-#endif
 
 /*
 ============
@@ -125,14 +118,6 @@ void Cvar_Set (char *var_name, char *value)
 		return;
 	}
 
-#ifdef SERVERONLY
-	if (var->info)
-	{
-		Info_SetValueForKey (svs.info, var_name, value, MAX_SERVERINFO_STRING);
-		SV_SendServerInfoChange(var_name, value);
-//		SV_BroadcastCommand ("fullserverinfo \"%s\"\n", svs.info);
-	}
-#else
 	if (var->info)
 	{
 		Info_SetValueForKey (cls.userinfo, var_name, value, MAX_INFO_STRING);
@@ -142,7 +127,6 @@ void Cvar_Set (char *var_name, char *value)
 			SZ_Print (&cls.netchan.message, va("setinfo \"%s\" \"%s\"\n", var_name, value));
 		}
 	}
-#endif
 	
 	Z_Free (var->string);	// free the old value string
 	
