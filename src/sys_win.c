@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errno.h"
 #include "fcntl.h"
 #include <limits.h>
+#include <SDL3/SDL_filesystem.h>
 
 #define MINIMUM_WIN_MEMORY	0x0c00000
 #define MAXIMUM_WIN_MEMORY	0xfffffff
@@ -120,7 +121,7 @@ int	Sys_FileTime (char *path)
 
 void Sys_mkdir (char *path)
 {
-	_mkdir (path);
+	SDL_CreateDirectory (path);
 }
 
 

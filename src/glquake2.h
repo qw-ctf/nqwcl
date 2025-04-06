@@ -6,8 +6,7 @@
   
 #include <windows.h>
 
-#include <gl\gl.h>
-#include <gl\glu.h>
+#include <SDL3/SDL_opengl.h>
 
 void GL_BeginRendering (int *x, int *y, int *width, int *height);
 void GL_EndRendering (void);

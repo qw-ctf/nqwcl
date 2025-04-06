@@ -2,6 +2,28 @@ cmake_minimum_required(VERSION 3.20)
 
 project(nqwcl C)
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT USE_LTO)
+if(USE_LTO)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE)
+endif()
+
+add_compile_options(
+        /nologo
+        /W3
+        /WX-
+        /diagnostics:column
+)
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug>)
+set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:ProgramDatabase>)
+
+set(CMAKE_VS_GLOBALS
+        "UseMultiToolTask=true"
+        "EnforceProcessCountAcrossBuilds=true"
+)
+
 set(SOURCES
         "src/cd_null.c"
         "src/cl_cam.c"
@@ -45,7 +67,8 @@ set(SOURCES
         "src/snd_mem.c"
         "src/snd_mix.c"
         "src/snd_win.c"
-        "src/sys_win.c"
+        #"src/sys_win.c"
+        "src/sys_sdl.c"
         "src/view.c"
         "src/wad.c"
         "src/zone.c"

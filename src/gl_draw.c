@@ -1211,8 +1211,6 @@ done: ;
 	}
 }
 
-extern qboolean VID_Is8bit();
-
 /*
 ===============
 GL_Upload8
@@ -1253,11 +1251,6 @@ static	unsigned	trans[640*480];		// FIXME, temporary
 			trans[i+2] = d_8to24table[data[i+2]];
 			trans[i+3] = d_8to24table[data[i+3]];
 		}
-	}
-
-	if (VID_Is8bit() && !alpha && (data!=scrap_texels[0])) {
-		GL_Upload8_EXT (data, width, height, mipmap, alpha);
-		return;
 	}
 
 	GL_Upload32 (trans, width, height, mipmap, alpha);

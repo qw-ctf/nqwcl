@@ -25,11 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 //#include "dosisms.h"
 
+/*
 #define DINPUT_BUFFERSIZE           16
 #define iDirectInputCreate(a,b,c,d)	pDirectInputCreate(a,b,c,d)
 
 HRESULT (WINAPI *pDirectInputCreate)(HINSTANCE hinst, DWORD dwVersion,
 	LPDIRECTINPUT * lplpDirectInput, LPUNKNOWN punkOuter);
+	*/
 
 // mouse variables
 cvar_t	m_filter = {"m_filter","0"};
@@ -100,7 +102,7 @@ cvar_t	joy_pitchsensitivity = {"joypitchsensitivity", "1.0"};
 cvar_t	joy_yawsensitivity = {"joyyawsensitivity", "-1.0"};
 cvar_t	joy_wwhack1 = {"joywwhack1", "0.0"};
 cvar_t	joy_wwhack2 = {"joywwhack2", "0.0"};
-
+/*
 qboolean	joy_avail, joy_advancedinit, joy_haspov;
 DWORD		joy_oldbuttonstate, joy_oldpovstate;
 
@@ -147,12 +149,12 @@ static DIDATAFORMAT	df = {
 	NUM_OBJECTS,                // number of objects
 	rgodf,                      // and here they are
 };
+*/
 
 // forward-referenced functions
 void IN_StartupJoystick (void);
 void Joy_AdvancedUpdate_f (void);
 void IN_JoyMove (usercmd_t *cmd);
-
 
 /*
 ===========
@@ -172,11 +174,12 @@ IN_UpdateClipCursor
 */
 void IN_UpdateClipCursor (void)
 {
-
+/*
 	if (mouseinitialized && mouseactive && !dinput)
 	{
 		ClipCursor (&window_rect);
 	}
+	*/
 }
 
 
@@ -187,12 +190,13 @@ IN_ShowMouse
 */
 void IN_ShowMouse (void)
 {
-
+/*
 	if (!mouseshowtoggle)
 	{
 		ShowCursor (TRUE);
 		mouseshowtoggle = 1;
 	}
+	*/
 }
 
 
@@ -203,12 +207,13 @@ IN_HideMouse
 */
 void IN_HideMouse (void)
 {
-
+/*
 	if (mouseshowtoggle)
 	{
 		ShowCursor (FALSE);
 		mouseshowtoggle = 0;
 	}
+	*/
 }
 
 
@@ -219,7 +224,7 @@ IN_ActivateMouse
 */
 void IN_ActivateMouse (void)
 {
-
+/*
 	mouseactivatetoggle = true;
 
 	if (mouseinitialized)
@@ -251,6 +256,7 @@ void IN_ActivateMouse (void)
 
 		mouseactive = true;
 	}
+	*/
 }
 
 
@@ -261,8 +267,10 @@ IN_SetQuakeMouseState
 */
 void IN_SetQuakeMouseState (void)
 {
+	/*
 	if (mouseactivatetoggle)
 		IN_ActivateMouse ();
+		*/
 }
 
 
@@ -273,7 +281,7 @@ IN_DeactivateMouse
 */
 void IN_DeactivateMouse (void)
 {
-
+/*
 	mouseactivatetoggle = false;
 
 	if (mouseinitialized)
@@ -300,6 +308,7 @@ void IN_DeactivateMouse (void)
 
 		mouseactive = false;
 	}
+	*/
 }
 
 
@@ -310,6 +319,7 @@ IN_RestoreOriginalMouseState
 */
 void IN_RestoreOriginalMouseState (void)
 {
+	/*
 	if (mouseactivatetoggle)
 	{
 		IN_DeactivateMouse ();
@@ -320,6 +330,7 @@ void IN_RestoreOriginalMouseState (void)
 // has garbage after the mode switch
 	ShowCursor (TRUE);
 	ShowCursor (FALSE);
+	*/
 }
 
 
@@ -330,6 +341,7 @@ IN_InitDInput
 */
 qboolean IN_InitDInput (void)
 {
+	/*
     HRESULT		hr;
 	DIPROPDWORD	dipdw = {
 		{
@@ -409,6 +421,7 @@ qboolean IN_InitDInput (void)
 		Con_SafePrintf ("Couldn't set DI buffersize\n");
 		return false;
 	}
+	*/
 
 	return true;
 }
@@ -421,6 +434,7 @@ IN_StartupMouse
 */
 void IN_StartupMouse (void)
 {
+	/*
 	HDC			hdc;
 
 	if ( COM_CheckParm ("-nomouse") ) 
@@ -472,6 +486,7 @@ void IN_StartupMouse (void)
 // set the mouse state appropriately
 	if (mouseactivatetoggle)
 		IN_ActivateMouse ();
+		*/
 }
 
 
@@ -522,7 +537,7 @@ IN_Shutdown
 */
 void IN_Shutdown (void)
 {
-
+/*
 	IN_DeactivateMouse ();
 	IN_ShowMouse ();
 
@@ -537,6 +552,7 @@ void IN_Shutdown (void)
 		IDirectInput_Release(g_pdi);
 		g_pdi = NULL;
 	}
+	*/
 }
 
 
@@ -547,6 +563,7 @@ IN_MouseEvent
 */
 void IN_MouseEvent (int mstate)
 {
+	/*
 	int		i;
 
 	if (mouseactive && !dinput)
@@ -569,6 +586,7 @@ void IN_MouseEvent (int mstate)
 			
 		mouse_oldbuttonstate = mstate;
 	}
+	*/
 }
 
 
@@ -579,6 +597,7 @@ IN_MouseMove
 */
 void IN_MouseMove (usercmd_t *cmd)
 {
+	/*
 	int		mx, my;
 	HDC	hdc;
 	int					i;
@@ -608,13 +627,13 @@ void IN_MouseMove (usercmd_t *cmd)
 				break;
 			}
 
-			/* Unable to read data or no data available */
+			// Unable to read data or no data available
 			if (FAILED(hr) || dwElements == 0)
 			{
 				break;
 			}
 
-			/* Look at the element to see what happened */
+			// Look at the element to see what happened
 
 			switch (od.dwOfs)
 			{
@@ -723,6 +742,7 @@ void IN_MouseMove (usercmd_t *cmd)
 	{
 		SetCursorPos (window_center_x, window_center_y);
 	}
+*/
 }
 
 
@@ -733,12 +753,13 @@ IN_Move
 */
 void IN_Move (usercmd_t *cmd)
 {
-
+/*
 	if (ActiveApp && !Minimized)
 	{
 		IN_MouseMove (cmd);
 		IN_JoyMove (cmd);
 	}
+	*/
 }
 
 
@@ -749,6 +770,7 @@ IN_Accumulate
 */
 void IN_Accumulate (void)
 {
+	/*
 	int		mx, my;
 	HDC	hdc;
 
@@ -762,6 +784,7 @@ void IN_Accumulate (void)
 	// force the mouse to the center, so there's room to move
 		SetCursorPos (window_center_x, window_center_y);
 	}
+	*/
 }
 
 
@@ -772,13 +795,14 @@ IN_ClearStates
 */
 void IN_ClearStates (void)
 {
-
+	/*
 	if (mouseactive)
 	{
 		mx_accum = 0;
 		my_accum = 0;
 		mouse_oldbuttonstate = 0;
 	}
+	*/
 }
 
 
@@ -788,7 +812,8 @@ IN_StartupJoystick
 =============== 
 */  
 void IN_StartupJoystick (void) 
-{ 
+{
+	/*
 	int			i, numdevs;
 	JOYCAPS		jc;
 	MMRESULT	mmr;
@@ -847,7 +872,8 @@ void IN_StartupJoystick (void)
 	joy_avail = true; 
 	joy_advancedinit = false;
 
-	Con_Printf ("\njoystick detected\n\n"); 
+	Con_Printf ("\njoystick detected\n\n");
+	*/
 }
 
 
@@ -858,6 +884,7 @@ RawValuePointer
 */
 PDWORD RawValuePointer (int axis)
 {
+	/*
 	switch (axis)
 	{
 	case JOY_AXIS_X:
@@ -873,6 +900,7 @@ PDWORD RawValuePointer (int axis)
 	case JOY_AXIS_V:
 		return &ji.dwVpos;
 	}
+	*/
 }
 
 
@@ -883,7 +911,7 @@ Joy_AdvancedUpdate_f
 */
 void Joy_AdvancedUpdate_f (void)
 {
-
+/*
 	// called once by IN_ReadJoystick and by user whenever an update is needed
 	// cvars are now available
 	int	i;
@@ -945,6 +973,7 @@ void Joy_AdvancedUpdate_f (void)
 			joy_flags |= dwAxisFlags[i];
 		}
 	}
+	*/
 }
 
 
@@ -955,6 +984,7 @@ IN_Commands
 */
 void IN_Commands (void)
 {
+	/*
 	int		i, key_index;
 	DWORD	buttonstate, povstate;
 
@@ -1015,6 +1045,7 @@ void IN_Commands (void)
 		}
 		joy_oldpovstate = povstate;
 	}
+	*/
 }
 
 
@@ -1025,6 +1056,7 @@ IN_ReadJoystick
 */  
 qboolean IN_ReadJoystick (void)
 {
+	/*
 
 	memset (&ji, 0, sizeof(ji));
 	ji.dwSize = sizeof(ji);
@@ -1050,6 +1082,7 @@ qboolean IN_ReadJoystick (void)
 		// joy_avail = false;
 		return false;
 	}
+	*/
 }
 
 
@@ -1060,6 +1093,7 @@ IN_JoyMove
 */
 void IN_JoyMove (usercmd_t *cmd)
 {
+	/*
 	float	speed, aspeed;
 	float	fAxisValue, fTemp;
 	int		i;
@@ -1229,4 +1263,5 @@ void IN_JoyMove (usercmd_t *cmd)
 		cl.viewangles[PITCH] = 80.0;
 	if (cl.viewangles[PITCH] < -70.0)
 		cl.viewangles[PITCH] = -70.0;
+		*/
 }
