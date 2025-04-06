@@ -1,0 +1,75 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 22,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "template-common",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build-${presetName}",
+            "cacheVariables": {
+                "CMAKE_VERBOSE_MAKEFILE": "ON",
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo;Release"
+            }
+        },
+        {
+            "name": "template-vcpkg",
+            "hidden": true,
+            "inherits": "template-common",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "vcpkg/scripts/buildsystems/vcpkg.cmake"
+                },
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_INSTALL_OPTIONS": "--clean-after-build",
+                "VCPKG_ENABLE_METRICS": "0",
+                "VCPKG_APPLOCAL_DEPS": "OFF",
+                "USE_SYSTEM_LIBS": "OFF"
+            }
+        },
+        {
+            "name": "msvc-x64",
+            "description": "Configure using Ninja to build with msvc",
+            "generator": "Ninja Multi-Config",
+            "inherits": "template-vcpkg",
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "msvc-x64-debug",
+            "configurePreset": "msvc-x64",
+            "displayName": "Build msvc-x64 debug",
+            "description": "Build MSVC debug configuration",
+            "configuration": "Debug"
+        },
+        {
+            "name": "msvc-x64-release",
+            "configurePreset": "msvc-x64",
+            "displayName": "Build ninja-msvc-x64 release",
+            "description": "Build MSVC release configuration",
+            "configuration": "Release"
+        },
+        {
+            "name": "msvc-x64-relwithdebinfo",
+            "configurePreset": "msvc-x64",
+            "displayName": "Build MSVC release with debug symbols",
+            "description": "Build MSVC release with debug info configuration",
+            "configuration": "RelWithDebInfo"
+        }
+    ]
+}

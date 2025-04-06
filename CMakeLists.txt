@@ -96,6 +96,8 @@ set(OpenGL_GL_PREFERENCE LEGACY)
 find_package(OpenGL REQUIRED)
 find_package(Threads REQUIRED)
 
+find_package(SDL3 REQUIRED)
+
 include_directories("src")
 add_definitions(-DGLQUAKE)
 
@@ -109,4 +111,5 @@ target_link_libraries(nqwcl
 
         OpenGL::GL
         Threads::Threads
+        SDL3::SDL3-static
 )
