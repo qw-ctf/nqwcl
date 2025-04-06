@@ -1605,7 +1605,7 @@ void	VID_Init (unsigned char *palette)
 	VID_InitDIB (global_hInstance);
 	basenummodes = nummodes = 1;
 
-	VID_InitFullDIB (global_hInstance);
+	//VID_InitFullDIB (global_hInstance);
 
 	if (COM_CheckParm("-window"))
 	{

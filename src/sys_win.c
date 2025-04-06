@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <limits.h>
 
 #define MINIMUM_WIN_MEMORY	0x0c00000
-#define MAXIMUM_WIN_MEMORY	0x1000000
+#define MAXIMUM_WIN_MEMORY	0xfffffff
 
 #define PAUSE_SLEEP		50				// sleep time on pause or minimization
 #define NOT_FOCUS_SLEEP	20				// sleep time when not focus
@@ -178,8 +178,8 @@ void Sys_Init (void)
         "qwcl"); /* Semaphore name      */
 #endif
 
-	MaskExceptions ();
-	Sys_SetFPCW ();
+	//MaskExceptions ();
+	//Sys_SetFPCW ();
 
 #if 0
 	if (!QueryPerformanceFrequency (&PerformanceFreq))

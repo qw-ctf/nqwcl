@@ -69,7 +69,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "view.h"
 #include "menu.h"
 #include "crc.h"
-#include "cdaudio.h"
 #include "pmove.h"
 
 #ifdef GLQUAKE
@@ -94,7 +93,7 @@ typedef struct
 	int		argc;
 	char	**argv;
 	void	*membase;
-	int		memsize;
+	size_t	memsize;
 } quakeparms_t;
 
 
