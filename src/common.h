@@ -32,6 +32,16 @@ typedef enum {false, true}	qboolean;
 #define	MAX_SERVERINFO_STRING	512
 #define	MAX_LOCALINFO_STRING	32768
 
+#define	q_min(a, b)	(((a) < (b)) ? (a) : (b))
+#define	q_max(a, b)	(((a) > (b)) ? (a) : (b))
+#define	CLAMP(_minval, x, _maxval)		\
+	((x) < (_minval) ? (_minval) :		\
+	(x) > (_maxval) ? (_maxval) : (x))
+
+#define LERP(a, b, t) ((a) + ((b)-(a))*(t))
+
+#define countof(arr) (sizeof(arr) / sizeof(arr[0]))
+
 //============================================================================
 
 typedef struct sizebuf_s

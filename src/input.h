@@ -32,3 +32,4 @@ void IN_Move (usercmd_t *cmd);
 void IN_ModeChanged (void);
 // called whenever screen dimensions change
 
+void IN_SendKeyEvents(void);

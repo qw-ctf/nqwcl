@@ -64,7 +64,7 @@ int		gl_solid_format = 3;
 int		gl_alpha_format = 4;
 
 int		gl_filter_min = GL_LINEAR_MIPMAP_NEAREST;
-int		gl_filter_max = GL_LINEAR;
+int		gl_filter_max = GL_NEAREST;
 
 
 int		texels;
@@ -385,11 +385,6 @@ void Draw_Init (void)
 	Cvar_RegisterVariable (&gl_nobind);
 	Cvar_RegisterVariable (&gl_max_size);
 	Cvar_RegisterVariable (&gl_picmip);
-
-	// 3dfx can only handle 256 wide textures
-	if (!Q_strncasecmp ((char *)gl_renderer, "3dfx",4) ||
-		!Q_strncasecmp ((char *)gl_renderer, "Mesa",4))
-		Cvar_Set ("gl_max_size", "256");
 
 	Cmd_AddCommand ("gl_texturemode", &Draw_TextureMode_f);
 
@@ -734,6 +729,11 @@ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
 	glEnd ();
 }
 
+void Draw_AdjustConsoleBackground(void)
+{
+	conback->width  = vid.conwidth;
+	conback->height = vid.conheight;
+}
 
 /*
 ================

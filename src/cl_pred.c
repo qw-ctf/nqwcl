@@ -147,9 +147,7 @@ void CL_PredictMove (void)
 
 		cls.state = ca_active;
 		sprintf (text, "QuakeWorld: %s", cls.servername);
-#ifdef _WIN32
-		SetWindowText (mainwindow, text);
-#endif
+		VID_SetTitle(text);
 	}
 
 	if (cl_nopred.value)

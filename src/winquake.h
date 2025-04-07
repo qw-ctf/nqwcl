@@ -22,30 +22,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef _WIN32 
 #pragma warning( disable : 4229 )  // mgraph gets this
 
-#include <windows.h>
+#include <SDL3/SDL.h>
 #define WM_MOUSEWHEEL                   0x020A
 
-#include <ddraw.h>
 #include <dsound.h>
 
 extern	HINSTANCE	global_hInstance;
 extern	int			global_nCmdShow;
 
 
-extern LPDIRECTDRAW		lpDD;
 extern qboolean			DDActive;
-extern LPDIRECTDRAWSURFACE	lpPrimary;
-extern LPDIRECTDRAWSURFACE	lpFrontBuffer;
-extern LPDIRECTDRAWSURFACE	lpBackBuffer;
-extern LPDIRECTDRAWPALETTE	lpDDPal;
 extern LPDIRECTSOUND pDS;
 extern LPDIRECTSOUNDBUFFER pDSBuf;
 
 extern DWORD gSndBufSize;
 //#define SNDBUFSIZE 65536
-
-void	VID_LockBuffer (void);
-void	VID_UnlockBuffer (void);
 
 
 typedef enum {MS_WINDOWED, MS_FULLSCREEN, MS_FULLDIB, MS_UNINIT} modestate_t;
@@ -57,16 +48,12 @@ extern qboolean		ActiveApp, Minimized;
 
 extern qboolean	WinNT;
 
-int VID_ForceUnlockedAndReturnState (void);
-void VID_ForceLockState (int lk);
-
 void IN_ShowMouse (void);
 void IN_DeactivateMouse (void);
 void IN_HideMouse (void);
 void IN_ActivateMouse (void);
-void IN_RestoreOriginalMouseState (void);
-void IN_SetQuakeMouseState (void);
-void IN_MouseEvent (int mstate);
+void IN_MouseEvent (void);
+void IN_Accumulate (float dx, float dy);
 
 extern qboolean	winsock_lib_initialized;
 

@@ -101,8 +101,6 @@ int	Sys_FileTime (char *path)
 	FILE	*f;
 	int		t, retval;
 
-	t = VID_ForceUnlockedAndReturnState ();
-	
 	f = fopen(path, "rb");
 
 	if (f)
@@ -115,7 +113,6 @@ int	Sys_FileTime (char *path)
 		retval = -1;
 	}
 	
-	VID_ForceLockState (t);
 	return retval;
 }
 
@@ -235,8 +232,6 @@ void Sys_Printf (char *fmt, ...)
 
 void Sys_Quit (void)
 {
-	VID_ForceUnlockedAndReturnState ();
-
 	Host_Shutdown();
 	if (tevent)
 		CloseHandle (tevent);
@@ -246,8 +241,6 @@ void Sys_Quit (void)
 
 	exit (0);
 }
-
-
 
 double Sys_DoubleTime (void)
 {

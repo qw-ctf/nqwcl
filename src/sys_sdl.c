@@ -10,7 +10,6 @@
 #define MINIMUM_WIN_MEMORY	0x0c00000
 #define MAXIMUM_WIN_MEMORY	0xfffffff
 
-qboolean ActiveApp, Minimized;
 extern SDL_Window *window;
 
 double Sys_DoubleTime (void)
@@ -80,8 +79,7 @@ void Sys_DebugLog(char *file, char *fmt, ...)
 
 void Sys_Quit (void)
 {
-	VID_ForceUnlockedAndReturnState ();
-
+	CL_Disconnect ();
 	Host_Shutdown();
 
 	exit (0);
@@ -91,8 +89,6 @@ int	Sys_FileTime (char *path)
 {
 	FILE	*f;
 	int		t, retval;
-
-	t = VID_ForceUnlockedAndReturnState ();
 
 	f = fopen(path, "rb");
 
@@ -106,21 +102,19 @@ int	Sys_FileTime (char *path)
 		retval = -1;
 	}
 
-	VID_ForceLockState (t);
 	return retval;
 }
 
-void IN_Frame();
 void Sys_SendKeyEvents (void)
 {
-	IN_Frame();
+	IN_SendKeyEvents();
 }
 
 int main(int argc, char **argv)
 {
    MSG				msg;
 	quakeparms_t	parms;
-	float			time, oldtime, newtime;
+	double			time, oldtime, newtime;
 	char			*cwd;
 	int				t;
 	RECT			rect;
@@ -176,7 +170,7 @@ int main(int argc, char **argv)
     /* main window message loop */
 	while (1)
 	{
-		newtime = (float) Sys_DoubleTime ();
+		newtime = Sys_DoubleTime ();
 		time = newtime - oldtime;
 		Host_Frame (time);
 		oldtime = newtime;

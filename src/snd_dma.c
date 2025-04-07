@@ -841,11 +841,6 @@ void GetSoundtime(void)
 
 void S_ExtraUpdate (void)
 {
-
-#ifdef _WIN32
-	IN_Accumulate ();
-#endif
-
 	if (snd_noextraupdate.value)
 		return;		// don't pollute timings
 	S_Update_();
@@ -884,7 +879,7 @@ void S_Update_(void)
 
 		if (pDSBuf)
 		{
-			if (pDSBuf->lpVtbl->GetStatus (pDSBuf, &dwStatus) != DD_OK)
+			if (pDSBuf->lpVtbl->GetStatus (pDSBuf, &dwStatus) != DS_OK)
 				Con_Printf ("Couldn't get sound buffer status\n");
 			
 			if (dwStatus & DSBSTATUS_BUFFERLOST)

@@ -1751,7 +1751,7 @@ void Info_RemoveKey (char *s, char *key)
 	char	value[512];
 	char	*o;
 
-	if (strstr (key, "\\"))
+	if (SDL_strstr (key, "\\"))
 	{
 		Con_Printf ("Can't use a key with a \\\n");
 		return;
@@ -2059,9 +2059,9 @@ int build_number( void )
 		d += mond[m];
 	}
 
-	d += atoi( &date[4] ) - 1;
+	d += SDL_atoi( &date[4] ) - 1;
 
-	y = atoi( &date[7] ) - 1900;
+	y = SDL_atoi( &date[7] ) - 1900;
 
 	b = d + (int)((y - 1) * 365.25);
 

@@ -11,8 +11,8 @@ endif()
 
 add_compile_options(
         /nologo
-        /W3
-        /WX-
+        /W2
+        /WX
         /diagnostics:column
 )
 
@@ -51,7 +51,7 @@ set(SOURCES
         "src/gl_screen.c"
         "src/gl_vidnt.c"
         "src/gl_warp.c"
-        "src/in_win.c"
+        "src/in_sdl.c"
         "src/keys.c"
         "src/mathlib.c"
         "src/md4.c"

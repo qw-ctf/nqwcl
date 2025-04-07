@@ -31,6 +31,10 @@ typedef	int	fixed16_t;
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
 
+#define M_PI_DIV_180 (M_PI / 180.0)
+#define DEG2RAD(a) ((a)*M_PI_DIV_180)
+#define RAD2DEG(a) ((a)*(180.0/M_PI))
+
 struct mplane_s;
 
 extern vec3_t vec3_origin;

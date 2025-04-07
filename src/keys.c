@@ -680,8 +680,6 @@ void Key_Event (int key, qboolean down)
 	char	*kb;
 	char	cmd[1024];
 
-//	Con_Printf ("%i : %i\n", key, down); //@@@
-
 	keydown[key] = down;
 
 	if (!down)
@@ -693,6 +691,13 @@ void Key_Event (int key, qboolean down)
 	{
 		return;		// just catching keys for Con_NotifyBox
 	}
+
+	if (down && key == K_ENTER && keydown[K_ALT])
+	{
+		VID_ToggleFullscreen();
+		return;
+	}
+
 
 // update auto-repeat status
 	if (down)
@@ -729,7 +734,10 @@ void Key_Event (int key, qboolean down)
 			break;
 		case key_game:
 		case key_console:
-			M_ToggleMenu_f ();
+			if (shift_down)
+				Con_ToggleConsole_f ();
+			else
+				M_ToggleMenu_f ();
 			break;
 		default:
 			Sys_Error ("Bad key_dest");
@@ -761,15 +769,6 @@ void Key_Event (int key, qboolean down)
 				Cbuf_AddText (cmd);
 			}
 		}
-		return;
-	}
-
-//
-// during demo playback, most keys bring up the main menu
-//
-	if (cls.demoplayback && down && consolekeys[key] && key_dest == key_game)
-	{
-		M_ToggleMenu_f ();
 		return;
 	}
 

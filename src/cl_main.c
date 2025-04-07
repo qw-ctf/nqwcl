@@ -31,9 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
 
-qboolean	noclip_anglehack;		// remnant from old quake
-
-
 cvar_t	rcon_password = {"rcon_password", "", false};
 
 cvar_t	rcon_address = {"rcon_address", ""};
@@ -46,9 +43,11 @@ cvar_t	cl_sbar		= {"cl_sbar", "0", true};
 cvar_t	cl_hudswap	= {"cl_hudswap", "0", true};
 cvar_t	cl_maxfps	= {"cl_maxfps", "0", true};
 
+cvar_t	freelook = {"freelook","1", true};
 cvar_t	lookspring = {"lookspring","0", true};
 cvar_t	lookstrafe = {"lookstrafe","0", true};
 cvar_t	sensitivity = {"sensitivity","3", true};
+cvar_t	cursor_sensitivity = {"scr_cursor_sensitivity","1", true};
 
 cvar_t	m_pitch = {"m_pitch","0.022", true};
 cvar_t	m_yaw = {"m_yaw","0.022"};
@@ -74,7 +73,7 @@ cvar_t	team = {"team","", true, true};
 cvar_t	skin = {"skin","", true, true};
 cvar_t	topcolor = {"topcolor","0", true, true};
 cvar_t	bottomcolor = {"bottomcolor","0", true, true};
-cvar_t	rate = {"rate","2500", true, true};
+cvar_t	rate = {"rate","50000", true, true};
 cvar_t	noaim = {"noaim","0", true, true};
 cvar_t	msg = {"msg","1", true, true};
 
@@ -409,9 +408,7 @@ void CL_Disconnect (void)
 
 	connect_time = -1;
 
-#ifdef _WIN32
-	SetWindowText (mainwindow, "QuakeWorld: disconnected");
-#endif
+	VID_SetTitle ("QuakeWorld: disconnected");
 
 // stop sounds (especially looping!)
 	S_StopAllSounds (true);
@@ -838,10 +835,9 @@ void CL_ConnectionlessPacket (void)
 			Con_Printf ("Command packet from remote host.  Ignored.\n");
 			return;
 		}
-#ifdef _WIN32
-		ShowWindow (mainwindow, SW_RESTORE);
-		SetForegroundWindow (mainwindow);
-#endif
+
+		VID_Restore();
+
 		s = MSG_ReadString ();
 
 		strncpy(cmdtext, s, sizeof(cmdtext) - 1);
@@ -1019,21 +1015,6 @@ void CL_Download_f (void)
 	SZ_Print (&cls.netchan.message, va("download %s\n",Cmd_Argv(1)));
 }
 
-#ifdef _WINDOWS
-#include <windows.h>
-/*
-=================
-CL_Minimize_f
-=================
-*/
-void CL_Windows_f (void) {
-//	if (modestate == MS_WINDOWED)
-//		ShowWindow(mainwindow, SW_MINIMIZE);
-//	else
-		SendMessage(mainwindow, WM_SYSKEYUP, VK_TAB, 1 | (0x0F << 16) | (1<<29));
-}
-#endif
-
 /*
 =================
 CL_Init
@@ -1160,13 +1141,6 @@ void CL_Init (void)
 	Cmd_AddCommand ("say", NULL);
 	Cmd_AddCommand ("say_team", NULL);
 	Cmd_AddCommand ("serverinfo", NULL);
-
-//
-//  Windows commands
-//
-#ifdef _WINDOWS
-	Cmd_AddCommand ("windows", CL_Windows_f);
-#endif
 }
 
 
@@ -1266,7 +1240,7 @@ Runs all active servers
 ==================
 */
 int		nopacketcount;
-void Host_Frame (float time)
+void Host_Frame (double time)
 {
 	static double		time1 = 0;
 	static double		time2 = 0;
@@ -1296,9 +1270,6 @@ void Host_Frame (float time)
 		
 	// get new key events
 	Sys_SendKeyEvents ();
-
-	// allow mice or other external controllers to add commands
-	IN_Commands ();
 
 	// process console commands
 	Cbuf_Execute ();
@@ -1488,8 +1459,7 @@ void Host_Shutdown(void)
 	}
 	isdown = true;
 
-	Host_WriteConfiguration (); 
-		
+	Host_WriteConfiguration ();
 	CDAudio_Shutdown ();
 	NET_Shutdown ();
 	S_Shutdown();

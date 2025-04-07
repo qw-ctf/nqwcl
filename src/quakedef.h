@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma warning( disable : 4244 4127 4201 4214 4514 4305 4115 4018)
 #endif
 
+#include <SDL3/SDL.h>
 
 #include <math.h>
 #include <string.h>
@@ -124,7 +125,7 @@ void Host_Shutdown(void);
 void Host_Error (char *error, ...);
 void Host_EndGame (char *message, ...);
 qboolean Host_SimulationTime(float time);
-void Host_Frame (float time);
+void Host_Frame (double time);
 void Host_Quit_f (void);
 void Host_ClientCommands (char *fmt, ...);
 void Host_ShutdownServer (qboolean crash);

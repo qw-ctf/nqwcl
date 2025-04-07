@@ -145,254 +145,25 @@ cvar_t		_vid_default_mode_win = {"_vid_default_mode_win","3", true};
 cvar_t		vid_wait = {"vid_wait","0"};
 cvar_t		vid_nopageflip = {"vid_nopageflip","0", true};
 cvar_t		_vid_wait_override = {"_vid_wait_override", "0", true};
-cvar_t		vid_config_x = {"vid_config_x","800", true};
-cvar_t		vid_config_y = {"vid_config_y","600", true};
+cvar_t		vid_config_x = {"vid_config_x","1280", true};
+cvar_t		vid_config_y = {"vid_config_y","720", true};
 cvar_t		vid_stretch_by_2 = {"vid_stretch_by_2","1", true};
 cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
 
 int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
 RECT		window_rect;
 
-// direct draw software compatability stuff
-
-void VID_HandlePause (qboolean pause)
+void VID_SetWindowedMode (qboolean fullscreen)
 {
+	SDL_SetWindowFullscreen(window, fullscreen);
+	modestate = fullscreen ? MS_FULLSCREEN : MS_WINDOWED;
 }
 
-void VID_ForceLockState (int lk)
-{
-}
-
-void VID_LockBuffer (void)
-{
-}
-
-void VID_UnlockBuffer (void)
-{
-}
-
-int VID_ForceUnlockedAndReturnState (void)
-{
-	return 0;
-}
-
-void D_BeginDirectRect (int x, int y, byte *pbitmap, int width, int height)
-{
-}
-
-void D_EndDirectRect (int x, int y, int width, int height)
-{
-}
-
-qboolean VID_SetWindowedMode (int modenum)
-{
-	SDL_SetWindowFullscreen(window, false);
-
-	/*
-	if (vid.conheight > modelist[modenum].height)
-		vid.conheight = modelist[modenum].height;
-	if (vid.conwidth > modelist[modenum].width)
-		vid.conwidth = modelist[modenum].width;
-	vid.width = vid.conwidth;
-	vid.height = vid.conheight;
-
-	vid.numpages = 2;
-	*/
-
-	/* TODO: hum?
-	mainwindow = dibwindow;
-
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)TRUE, (LPARAM)hIcon);
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)FALSE, (LPARAM)hIcon);
-	*/
-
-	return true;
+void VID_ToggleFullscreen(void) {
+	VID_SetWindowedMode(modestate == MS_WINDOWED);
 }
 
 
-qboolean VID_SetFullDIBMode (int modenum)
-{
-	/*
-	HDC				hdc;
-	int				lastmodestate, width, height;
-	RECT			rect;
-
-	if (!leavecurrentmode)
-	{
-		gdevmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		gdevmode.dmBitsPerPel = modelist[modenum].bpp;
-		gdevmode.dmPelsWidth = modelist[modenum].width <<
-							   modelist[modenum].halfscreen;
-		gdevmode.dmPelsHeight = modelist[modenum].height;
-		gdevmode.dmSize = sizeof (gdevmode);
-
-		if (ChangeDisplaySettings (&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-			Sys_Error ("Couldn't set fullscreen DIB mode");
-	}
-
-	lastmodestate = modestate;
-	modestate = MS_FULLDIB;
-
-	WindowRect.top = WindowRect.left = 0;
-
-	WindowRect.right = modelist[modenum].width;
-	WindowRect.bottom = modelist[modenum].height;
-
-	DIBWidth = modelist[modenum].width;
-	DIBHeight = modelist[modenum].height;
-
-	WindowStyle = WS_POPUP;
-	ExWindowStyle = 0;
-
-	rect = WindowRect;
-	AdjustWindowRectEx(&rect, WindowStyle, FALSE, 0);
-
-	width = rect.right - rect.left;
-	height = rect.bottom - rect.top;
-
-	// Create the DIB window
-	dibwindow = CreateWindowEx (
-		 ExWindowStyle,
-		 "WinQuake",
-		 "GLQuake",
-		 WindowStyle,
-		 rect.left, rect.top,
-		 width,
-		 height,
-		 NULL,
-		 NULL,
-		 global_hInstance,
-		 NULL);
-
-	if (!dibwindow)
-		Sys_Error ("Couldn't create DIB window");
-
-	ShowWindow (dibwindow, SW_SHOWDEFAULT);
-	UpdateWindow (dibwindow);
-
-	// Because we have set the background brush for the window to NULL
-	// (to avoid flickering when re-sizing the window on the desktop), we
-	// clear the window to black when created, otherwise it will be
-	// empty while Quake starts up.
-	hdc = GetDC(dibwindow);
-	PatBlt(hdc,0,0,WindowRect.right,WindowRect.bottom,BLACKNESS);
-	ReleaseDC(dibwindow, hdc);
-
-	if (vid.conheight > modelist[modenum].height)
-		vid.conheight = modelist[modenum].height;
-	if (vid.conwidth > modelist[modenum].width)
-		vid.conwidth = modelist[modenum].width;
-	vid.width = vid.conwidth;
-	vid.height = vid.conheight;
-
-	vid.numpages = 2;
-
-// needed because we're not getting WM_MOVE messages fullscreen on NT
-	window_x = 0;
-	window_y = 0;
-
-	mainwindow = dibwindow;
-
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)TRUE, (LPARAM)hIcon);
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)FALSE, (LPARAM)hIcon);
-	*/
-
-	return true;
-}
-
-
-int VID_SetMode (int modenum, unsigned char *palette)
-{
-	/* TODO: probably just dont give a fuck
-	if (vid_modenum == NO_MODE)
-		original_mode = windowed_default;
-	else
-		original_mode = vid_modenum;
-
-	// Set either the fullscreen or windowed mode
-	if (modelist[modenum].type == MS_WINDOWED)
-	{
-		if (_windowed_mouse.value && key_dest == key_game)
-		{
-			stat = VID_SetWindowedMode(modenum);
-			IN_ActivateMouse ();
-			IN_HideMouse ();
-		}
-		else
-		{
-			IN_DeactivateMouse ();
-			IN_ShowMouse ();
-			stat = VID_SetWindowedMode(modenum);
-		}
-	}
-	else if (modelist[modenum].type == MS_FULLDIB)
-	{
-		stat = VID_SetFullDIBMode(modenum);
-		IN_ActivateMouse ();
-		IN_HideMouse ();
-	}
-	else
-	{
-		Sys_Error ("VID_SetMode: Bad mode type in modelist");
-	}
-
-	window_width = DIBWidth;
-	window_height = DIBHeight;
-	VID_UpdateWindowStatus ();
-
-	CDAudio_Resume ();
-	scr_disabled_for_loading = temp;
-
-	if (!stat)
-	{
-		Sys_Error ("Couldn't set video mode");
-	}
-
-// now we try to make sure we get the focus on the mode switch, because
-// sometimes in some systems we don't.  We grab the foreground, then
-// finish setting up, pump all our messages, and sleep for a little while
-// to let messages finish bouncing around the system, then we put
-// ourselves at the top of the z order, then grab the foreground again,
-// Who knows if it helps, but it probably doesn't hurt
-	SetForegroundWindow (mainwindow);
-	VID_SetPalette (palette);
-	vid_modenum = modenum;
-	Cvar_SetValue ("vid_mode", (float)vid_modenum);
-
-	while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
-	{
-      	TranslateMessage (&msg);
-      	DispatchMessage (&msg);
-	}
-
-	Sleep (100);
-
-	SetWindowPos (mainwindow, HWND_TOP, 0, 0, 0, 0,
-				  SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW |
-				  SWP_NOCOPYBITS);
-
-	SetForegroundWindow (mainwindow);
-
-// fix the leftover Alt from any Alt-Tab or the like that switched us away
-	ClearAllStates ();
-
-	if (!msg_suppress_1)
-		Con_SafePrintf ("Video mode %s initialized.\n", VID_GetModeDescription (vid_modenum));
-
-	VID_SetPalette (palette);
-
-	vid.recalc_refdef = 1;
-	*/
-
-	return true;
-}
-
-
-/*
-================
-VID_UpdateWindowStatus
-================
-*/
 void VID_UpdateWindowStatus (void)
 {
 
@@ -402,12 +173,22 @@ void VID_UpdateWindowStatus (void)
 	window_rect.bottom = window_y + window_height;
 	window_center_x = (window_rect.left + window_rect.right) / 2;
 	window_center_y = (window_rect.top + window_rect.bottom) / 2;
-
-	IN_UpdateClipCursor ();
 }
 
+void VID_SetTitle(const char *title)
+{
+	SDL_SetWindowTitle(window, title);
+}
 
-//====================================
+void VID_Restore(void)
+{
+	if (!window || (SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS)) {
+		return;
+	}
+
+	SDL_RestoreWindow(window);
+	SDL_RaiseWindow(window);
+}
 
 BINDTEXFUNCPTR bindTexFunc;
 
@@ -430,23 +211,9 @@ void CheckTextureExtensions (void)
 		tmp++;
 	}
 
-	if (!texture_ext || COM_CheckParm ("-gl11") )
-	{
-		hInstGL = LoadLibrary("opengl32.dll");
-		
-		if (hInstGL == NULL)
-			Sys_Error ("Couldn't load opengl32.dll\n");
-
-		bindTexFunc = (void *)GetProcAddress(hInstGL,"glBindTexture");
-
-		if (!bindTexFunc)
-			Sys_Error ("No texture objects!");
-		return;
-	}
 
 /* load library and get procedure adresses for texture extension API */
-	if ((bindTexFunc = (BINDTEXFUNCPTR)
-		wglGetProcAddress((LPCSTR) "glBindTextureEXT")) == NULL)
+	if ((bindTexFunc = (BINDTEXFUNCPTR) SDL_GL_GetProcAddress("glBindTextureEXT")) == NULL)
 	{
 		Sys_Error ("GetProcAddress for BindTextureEXT failed");
 		return;
@@ -464,10 +231,10 @@ void CheckArrayExtensions (void)
 		if (strncmp((const char*)tmp, "GL_EXT_vertex_array", strlen("GL_EXT_vertex_array")) == 0)
 		{
 			if (
-((glArrayElementEXT = wglGetProcAddress("glArrayElementEXT")) == NULL) ||
-((glColorPointerEXT = wglGetProcAddress("glColorPointerEXT")) == NULL) ||
-((glTexCoordPointerEXT = wglGetProcAddress("glTexCoordPointerEXT")) == NULL) ||
-((glVertexPointerEXT = wglGetProcAddress("glVertexPointerEXT")) == NULL) )
+((glArrayElementEXT = (PROC) SDL_GL_GetProcAddress("glArrayElementEXT")) == NULL) ||
+((glColorPointerEXT = (PROC) SDL_GL_GetProcAddress("glColorPointerEXT")) == NULL) ||
+((glTexCoordPointerEXT = (PROC) SDL_GL_GetProcAddress("glTexCoordPointerEXT")) == NULL) ||
+((glVertexPointerEXT = (PROC) SDL_GL_GetProcAddress("glVertexPointerEXT")) == NULL) )
 			{
 				Sys_Error ("GetProcAddress for vertex extension failed");
 				return;
@@ -494,8 +261,8 @@ void CheckMultiTextureExtensions(void)
 {
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
 		Con_Printf("Multitexture extensions found.\n");
-		qglMTexCoord2fSGIS = (void *) wglGetProcAddress("glMTexCoord2fSGIS");
-		qglSelectTextureSGIS = (void *) wglGetProcAddress("glSelectTextureSGIS");
+		qglMTexCoord2fSGIS = (void *) SDL_GL_GetProcAddress("glMTexCoord2fSGIS");
+		qglSelectTextureSGIS = (void *) SDL_GL_GetProcAddress("glSelectTextureSGIS");
 		gl_mtexable = true;
 	}
 }
@@ -564,16 +331,9 @@ GL_BeginRendering
 */
 void GL_BeginRendering (int *x, int *y, int *width, int *height)
 {
-	extern cvar_t gl_clear;
-
 	*x = *y = 0;
 	*width = vid.width;
 	*height = vid.height;
-
-//    if (!wglMakeCurrent( maindc, baseRC ))
-//		Sys_Error ("wglMakeCurrent failed");
-
-//	glViewport (*x, *y, *width, *height);
 }
 
 
@@ -674,7 +434,7 @@ void	VID_ShiftPalette (unsigned char *palette)
 {
 	extern	byte ramps[3][256];
 	
-//	VID_SetPalette (palette);
+	VID_SetPalette (palette);
 
 //	gammaworks = SetDeviceGammaRamp (maindc, ramps);
 }
@@ -686,125 +446,16 @@ void VID_SetDefaultMode (void)
 }
 
 
-void	VID_Shutdown (void)
+void VID_Shutdown (void)
 {
-   	HGLRC hRC;
-   	HDC	  hDC;
-
 	if (vid_initialized)
 	{
 		vid_canalttab = false;
-
 		SDL_GL_DestroyContext(context);
+		SDL_DestroyWindow(window);
 	}
 }
 
-
-//==========================================================================
-
-
-BOOL bSetupPixelFormat(HDC hDC)
-{
-    static PIXELFORMATDESCRIPTOR pfd = {
-	sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
-	1,				// version number
-	PFD_DRAW_TO_WINDOW 		// support window
-	|  PFD_SUPPORT_OPENGL 	// support OpenGL
-	|  PFD_DOUBLEBUFFER ,	// double buffered
-	PFD_TYPE_RGBA,			// RGBA type
-	24,				// 24-bit color depth
-	0, 0, 0, 0, 0, 0,		// color bits ignored
-	0,				// no alpha buffer
-	0,				// shift bit ignored
-	0,				// no accumulation buffer
-	0, 0, 0, 0, 			// accum bits ignored
-	32,				// 32-bit z-buffer	
-	0,				// no stencil buffer
-	0,				// no auxiliary buffer
-	PFD_MAIN_PLANE,			// main layer
-	0,				// reserved
-	0, 0, 0				// layer masks ignored
-    };
-    int pixelformat;
-
-    if ( (pixelformat = ChoosePixelFormat(hDC, &pfd)) == 0 )
-    {
-        MessageBox(NULL, "ChoosePixelFormat failed", "Error", MB_OK);
-        return FALSE;
-    }
-
-    if (SetPixelFormat(hDC, pixelformat, &pfd) == FALSE)
-    {
-        MessageBox(NULL, "SetPixelFormat failed", "Error", MB_OK);
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-
-
-byte        scantokey[128] = 
-					{ 
-//  0           1       2       3       4       5       6       7 
-//  8           9       A       B       C       D       E       F 
-	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
-	'7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
-	'q',    'w',    'e',    'r',    't',    'y',    'u',    'i', 
-	'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
-	'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';', 
-	'\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
-	'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10, K_PAUSE  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
-
-byte        shiftscantokey[128] = 
-					{ 
-//  0           1       2       3       4       5       6       7 
-//  8           9       A       B       C       D       E       F 
-	0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
-	'&',    '*',    '(',    ')',    '_',    '+',    K_BACKSPACE, 9, // 0 
-	'Q',    'W',    'E',    'R',    'T',    'Y',    'U',    'I', 
-	'O',    'P',    '{',    '}',    13 ,    K_CTRL,'A',  'S',      // 1 
-	'D',    'F',    'G',    'H',    'J',    'K',    'L',    ':', 
-	'"' ,    '~',    K_SHIFT,'|',  'Z',    'X',    'C',    'V',      // 2 
-	'B',    'N',    'M',    '<',    '>',    '?',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10, K_PAUSE  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'_',K_LEFTARROW,'%',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
-
-
-/*
-=======
-MapKey
-
-Map from windows to quake keynums
-=======
-*/
-int MapKey (int key)
-{
-	key = (key>>16)&255;
-	if (key > 127)
-		return 0;
-	if (scantokey[key] == 0)
-		Con_DPrintf("key 0x%02x has no translation\n", key);
-	return scantokey[key];
-}
 
 /*
 ===================================================================
@@ -903,21 +554,15 @@ void AppActivate(BOOL fActive, BOOL minimize)
 	}
 }
 
-void IN_Frame(void)
-{
-	SDL_Event event;
-
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-			case SDL_EVENT_QUIT:
-				Sys_Quit();
-			    break;
-			default:
-				break;
-		}
-	}
-
+void VID_WindowResized(void) {
+	SDL_GetWindowSizeInPixels(window, &vid.width, &vid.height);
+	vid.conwidth = vid.width;
+	vid.conheight = vid.height;
+	vid.recalc_refdef = true;
+	SCR_UpdateScreen();
+	Draw_AdjustConsoleBackground();
 }
+
 
 
 /* main window procedure
@@ -1306,7 +951,7 @@ void	VID_Init (unsigned char *palette)
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-	SDL_WindowFlags window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+	SDL_WindowFlags window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
 	window = SDL_CreateWindow("nqwcl", width, height, window_flags);
 	if (!window)
@@ -1323,7 +968,7 @@ void	VID_Init (unsigned char *palette)
 	}
 
 	SDL_GL_MakeCurrent(window, context);
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval(1);
 	SDL_ShowWindow(window);
 
 	if (true || COM_CheckParm("-window"))
@@ -1370,7 +1015,7 @@ void	VID_Init (unsigned char *palette)
 	vid.conwidth = vid.width;
 	vid.conheight = vid.height;
 
-	//VID_SetMode (vid_default, palette);
+	modestate = MS_WINDOWED;
 
 	GL_Init ();
 
