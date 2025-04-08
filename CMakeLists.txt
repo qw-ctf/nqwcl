@@ -129,7 +129,6 @@ target_link_libraries(nqwcl
         wsock32
         ws2_32
         winmm
-        dxguid
         comctl32
 
         OpenGL::GL
