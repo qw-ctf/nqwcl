@@ -968,7 +968,7 @@ void	VID_Init (unsigned char *palette)
 	}
 
 	SDL_GL_MakeCurrent(window, context);
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(0);
 	SDL_ShowWindow(window);
 
 	if (true || COM_CheckParm("-window"))
