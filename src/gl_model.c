@@ -715,10 +715,10 @@ void CalcSurfaceExtents (msurface_t *s)
 		
 		for (j=0 ; j<2 ; j++)
 		{
-			val = v->position[0] * tex->vecs[j][0] + 
-				v->position[1] * tex->vecs[j][1] +
-				v->position[2] * tex->vecs[j][2] +
-				tex->vecs[j][3];
+			val = (double) v->position[0] * (double) tex->vecs[j][0] +
+				  (double) v->position[1] * (double) tex->vecs[j][1] +
+				  (double) v->position[2] * (double) tex->vecs[j][2] +
+				  (double) tex->vecs[j][3];
 			if (val < mins[j])
 				mins[j] = val;
 			if (val > maxs[j])
@@ -733,7 +733,7 @@ void CalcSurfaceExtents (msurface_t *s)
 
 		s->texturemins[i] = bmins[i] * 16;
 		s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
-		if ( !(tex->flags & TEX_SPECIAL) && s->extents[i] > 512 /* 256 */ )
+		if (!(tex->flags & TEX_SPECIAL) && s->extents[i] > 512)
 			Sys_Error ("Bad surface extents");
 	}
 }
