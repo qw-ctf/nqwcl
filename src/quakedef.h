@@ -112,6 +112,7 @@ extern	cvar_t	password;
 
 extern	qboolean	host_initialized;		// true if into command execution
 extern	double		host_frametime;
+extern	double		host_rawframetime;
 extern	byte		*host_basepal;
 extern	byte		*host_colormap;
 extern	int			host_framecount;	// incremented every frame, never reset

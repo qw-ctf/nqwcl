@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <netinet/in.h>
 #endif
 
+#define DEFAULT_NETFPS 77.0
 
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
@@ -104,6 +105,8 @@ qboolean	host_initialized;		// true if into command execution
 qboolean	nomaster;
 
 double		host_frametime;
+double		host_rawframetime;
+double		host_netinterval;
 double		realtime;				// without any filtering or bounding
 double		oldrealtime;			// last frame run
 int			host_framecount;
@@ -574,6 +577,9 @@ void CL_FullServerinfo_f (void)
 			server_version = v;
 		}
 	}
+
+	p = Info_ValueForKey(cl.serverinfo, "maxfps");
+	host_netinterval = 1.0 / (*p ? (float) SDL_atof(p) : DEFAULT_NETFPS);
 }
 
 /*
@@ -1031,7 +1037,7 @@ void CL_Init (void)
 	Info_SetValueForKey (cls.userinfo, "name", "unnamed", MAX_INFO_STRING);
 	Info_SetValueForKey (cls.userinfo, "topcolor", "0", MAX_INFO_STRING);
 	Info_SetValueForKey (cls.userinfo, "bottomcolor", "0", MAX_INFO_STRING);
-	Info_SetValueForKey (cls.userinfo, "rate", "2500", MAX_INFO_STRING);
+	Info_SetValueForKey (cls.userinfo, "rate", "50000", MAX_INFO_STRING);
 	Info_SetValueForKey (cls.userinfo, "msg", "1", MAX_INFO_STRING);
 	sprintf (st, "%4.2f-%04d", VERSION, build_number());
 	Info_SetValueForStarKey (cls.userinfo, "*ver", st, MAX_INFO_STRING);
@@ -1230,6 +1236,19 @@ void Host_WriteConfiguration (void)
 
 //============================================================================
 
+/*
+===================
+Host_AdvanceTime
+===================
+*/
+static void Host_AdvanceTime (double dt)
+{
+	realtime += dt;
+	host_rawframetime = realtime - oldrealtime;
+	oldrealtime = realtime;
+
+	host_frametime = SDL_clamp(0.0001, host_frametime, 0.1);
+}
 
 
 /*
@@ -1239,62 +1258,64 @@ Host_Frame
 Runs all active servers
 ==================
 */
-int		nopacketcount;
 void Host_Frame (double time)
 {
+	static double	accumtime = 0;
 	static double		time1 = 0;
 	static double		time2 = 0;
 	static double		time3 = 0;
 	int			pass1, pass2, pass3;
-	float fps;
-	if (setjmp (host_abort) )
-		return;			// something bad happened, or the server disconnected
 
-	// decide the simulation time
-	realtime += time;
-	if (oldrealtime > realtime)
-		oldrealtime = 0;
+	if (setjmp (host_abort)) {
+		// something bad happened, or the server disconnected
+		return;
+	}
 
-	if (cl_maxfps.value)
-		fps = max(30.0, min(cl_maxfps.value, 72.0));
-	else
-		fps = max(30.0, min(rate.value/80.0, 72.0));
+	accumtime += host_netinterval ? SDL_clamp(0.0, time, 0.2) : 0.0;
 
-	if (!cls.timedemo && realtime - oldrealtime < 1.0/fps)
-		return;			// framerate is too high
+	Host_AdvanceTime (time);
 
-	host_frametime = realtime - oldrealtime;
-	oldrealtime = realtime;
-	if (host_frametime > 0.2)
-		host_frametime = 0.2;
-		
-	// get new key events
-	Sys_SendKeyEvents ();
+	if (cls.timedemo || accumtime >= host_netinterval) {
+		float realframetime = host_frametime;
+		if (host_netinterval) {
+			host_frametime = SDL_max(accumtime, (double) host_netinterval);
+			accumtime -= host_frametime;
+		}
 
-	// process console commands
-	Cbuf_Execute ();
+		// get new key events
+		Sys_SendKeyEvents ();
 
-	// fetch results from server
-	CL_ReadPackets ();
+		// process console commands
+		Cbuf_Execute ();
 
-	// send intentions now
-	// resend a connection request if necessary
-	if (cls.state == ca_disconnected) {
-		CL_CheckForResend ();
-	} else
-		CL_SendCmd ();
+		// fetch results from server
+		CL_ReadPackets ();
 
-	// Set up prediction for other players
-	CL_SetUpPlayerPrediction(false);
+		// send intentions now
+		// resend a connection request if necessary
+		if (cls.state == ca_disconnected) {
+			CL_CheckForResend ();
+		} else
+			CL_SendCmd ();
 
-	// do client side motion prediction
-	CL_PredictMove ();
+		// Set up prediction for other players
+		CL_SetUpPlayerPrediction(false);
 
-	// Set up prediction for other players
-	CL_SetUpPlayerPrediction(true);
+		// do client side motion prediction
+		CL_PredictMove ();
 
-	// build a refresh entity list
-	CL_EmitEntities ();
+		// Set up prediction for other players
+		CL_SetUpPlayerPrediction(true);
+
+		// build a refresh entity list
+		CL_EmitEntities ();
+
+		host_frametime = realframetime;
+	} else {
+		usercmd_t dummy;
+		Sys_SendKeyEvents();
+		IN_Move(&dummy);
+	}
 
 	// update video
 	if (host_speeds.value)
@@ -1313,7 +1334,7 @@ void Host_Frame (double time)
 	}
 	else
 		S_Update (vec3_origin, vec3_origin, vec3_origin, vec3_origin);
-	
+
 	CDAudio_Update();
 
 	if (host_speeds.value)
@@ -1325,6 +1346,7 @@ void Host_Frame (double time)
 		Con_Printf ("%3i tot %3i server %3i gfx %3i snd\n",
 					pass1+pass2+pass3, pass1, pass2, pass3);
 	}
+
 
 	host_framecount++;
 	fps_count++;

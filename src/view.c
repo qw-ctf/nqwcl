@@ -118,7 +118,7 @@ float V_CalcBob (void)
 	if (onground == -1)
 		return bob;		// just use old value
 
-	bobtime += host_frametime;
+	bobtime += host_rawframetime;
 	cycle = bobtime - (int)(bobtime/cl_bobcycle.value)*cl_bobcycle.value;
 	cycle /= cl_bobcycle.value;
 	if (cycle < cl_bobup.value)
