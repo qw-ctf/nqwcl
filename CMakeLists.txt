@@ -127,7 +127,6 @@ add_executable(nqwcl WIN32 ${SOURCES} ${HEADERS})
 target_link_libraries(nqwcl
         wsock32
         ws2_32
-        comctl32
 
         OpenGL::GL
         Threads::Threads

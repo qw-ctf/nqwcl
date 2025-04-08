@@ -920,8 +920,6 @@ void	VID_Init (unsigned char *palette)
 	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
 
 
-	InitCommonControls();
-
 	if (COM_CheckParm("-width"))
 	{
 		width = Q_atoi(com_argv[COM_CheckParm("-width")+1]);
