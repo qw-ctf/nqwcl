@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -38,13 +38,14 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 	int		i;
 	int		sample, samplefrac, fracstep;
 	sfxcache_t	*sc;
-	
+
 	sc = Cache_Check (&sfx->cache);
 	if (!sc)
 		return;
 
 	stepscale = (float)inrate / shm->speed;	// this is usually 0.5, 1, or 2
 
+	int in_length = sc->length;
 	outcount = sc->length / stepscale;
 	sc->length = outcount;
 	if (sc->loopstart != -1)
@@ -59,12 +60,27 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 
 // resample / decimate to the current source rate
 
+	SDL_AudioSpec in_spec;
+	in_spec.channels = 1;
+	in_spec.format = inwidth == 2 ? SDL_AUDIO_S16 : SDL_AUDIO_U8;
+	in_spec.freq = inrate;
+
+	SDL_AudioSpec out_spec;
+	out_spec.channels = 1;
+	out_spec.format = sc->width == 2 ? SDL_AUDIO_S16 : SDL_AUDIO_S8;
+	out_spec.freq = sc->speed;
+
+	if (!SDL_ConvertAudioSamples(&in_spec, data, in_length, &out_spec, (uint8_t**)&sc->data, &sc->length)) {
+		Con_Printf("could not resample: %s\n", SDL_GetError());
+	}
+	//return;
+
+
 	if (stepscale == 1 && inwidth == 1 && sc->width == 1)
 	{
 // fast special case
 		for (i=0 ; i<outcount ; i++)
-			((signed char *)sc->data)[i]
-			= (int)( (unsigned char)(data[i]) - 128);
+			((signed char *)sc->data)[i] = (int)( (unsigned char)(data[i]) - 128);
 	}
 	else
 	{
@@ -131,7 +147,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 		return NULL;
 	}
 
-	stepscale = (float)info.rate / shm->speed;	
+	stepscale = (float)info.rate / shm->speed;
 	len = info.samples / stepscale;
 
 	len = len * info.width * info.channels;
@@ -139,7 +155,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	sc = Cache_Alloc ( &s->cache, len + sizeof(sfxcache_t), s->name);
 	if (!sc)
 		return NULL;
-	
+
 	sc->length = info.samples;
 	sc->loopstart = info.loopstart;
 	sc->speed = info.rate;
@@ -200,7 +216,7 @@ void FindNextChunk(char *name)
 			data_p = NULL;
 			return;
 		}
-		
+
 		data_p += 4;
 		iff_chunk_len = GetLittleLong();
 		if (iff_chunk_len < 0)
@@ -208,8 +224,6 @@ void FindNextChunk(char *name)
 			data_p = NULL;
 			return;
 		}
-//		if (iff_chunk_len > 1024*1024)
-//			Sys_Error ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
 		data_p -= 8;
 		last_chunk = data_p + 8 + ( (iff_chunk_len + 1) & ~1 );
 		if (!Q_strncmp(data_p, name, 4))
@@ -241,7 +255,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 
 	if (!wav)
 		return info;
-		
+
 	iff_data = wav;
 	iff_end = wav + wavlength;
 
@@ -282,7 +296,6 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	{
 		data_p += 32;
 		info.loopstart = GetLittleLong();
-//		Con_Printf("loopstart=%d\n", sfx->loopstart);
 
 	// if the next chunk is a LIST chunk, look for a cue length marker
 		FindNextChunk ("LIST");
@@ -293,7 +306,6 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 				data_p += 24;
 				i = GetLittleLong ();	// samples in loop
 				info.samples = info.loopstart + i;
-//				Con_Printf("looped length: %i\n", i);
 			}
 		}
 	}
@@ -320,7 +332,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 		info.samples = samples;
 
 	info.dataofs = data_p - wav;
-	
+
 	return info;
 }
 

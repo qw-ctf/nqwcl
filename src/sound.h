@@ -112,13 +112,25 @@ channel_t *SND_PickChannel(int entnum, int entchannel);
 void SND_Spatialize(channel_t *ch);
 
 // initializes cycling through a DMA buffer and returns information on it
-qboolean SNDDMA_Init(void);
+qboolean SNDDMA_Init(dma_t *dma);
 
 // gets the current DMA position
 int SNDDMA_GetDMAPos(void);
 
 // shutdown the DMA xfer.
 void SNDDMA_Shutdown(void);
+
+// validates & locks the dma buffer
+void SNDDMA_LockBuffer (void);
+
+// unlocks the dma buffer / sends sound to the device
+void SNDDMA_Submit (void);
+
+// blocks sound output upon window focus loss
+void SNDDMA_BlockSound (void);
+
+// unblocks the output upon window focus gain
+void SNDDMA_UnblockSound (void);
 
 // ====================================================================
 // User-setable variables
@@ -149,7 +161,6 @@ extern vec3_t listener_forward;
 extern vec3_t listener_right;
 extern vec3_t listener_up;
 extern volatile dma_t *shm;
-extern volatile dma_t sn;
 extern vec_t sound_nominal_clip_dist;
 
 extern	cvar_t loadas8bit;

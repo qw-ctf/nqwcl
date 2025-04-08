@@ -25,15 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <SDL3/SDL.h>
 #define WM_MOUSEWHEEL                   0x020A
 
-#include <dsound.h>
 
 extern	HINSTANCE	global_hInstance;
 extern	int			global_nCmdShow;
 
 
 extern qboolean			DDActive;
-extern LPDIRECTSOUND pDS;
-extern LPDIRECTSOUNDBUFFER pDSBuf;
 
 extern DWORD gSndBufSize;
 //#define SNDBUFSIZE 65536

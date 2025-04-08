@@ -66,8 +66,7 @@ set(SOURCES
         "src/snd_dma.c"
         "src/snd_mem.c"
         "src/snd_mix.c"
-        "src/snd_win.c"
-        #"src/sys_win.c"
+        "src/snd_sdl.c"
         "src/sys_sdl.c"
         "src/view.c"
         "src/wad.c"
@@ -128,7 +127,6 @@ add_executable(nqwcl WIN32 ${SOURCES} ${HEADERS})
 target_link_libraries(nqwcl
         wsock32
         ws2_32
-        winmm
         comctl32
 
         OpenGL::GL
