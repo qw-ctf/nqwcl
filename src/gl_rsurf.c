@@ -321,10 +321,9 @@ void R_DrawSequentialPoly (msurface_t *s)
 	//
 	// normal lightmaped poly
 	//
-//	if ((!(s->flags & (SURF_DRAWSKY|SURF_DRAWTURB)))
-//		&& ((r_viewleaf->contents!=CONTENTS_EMPTY && (s->flags & SURF_UNDERWATER)) ||
-//		(r_viewleaf->contents==CONTENTS_EMPTY && !(s->flags & SURF_UNDERWATER))))
-	if (0)
+	if ((!(s->flags & (SURF_DRAWSKY|SURF_DRAWTURB)))
+		&& ((r_viewleaf->contents!=CONTENTS_EMPTY && (s->flags & SURF_UNDERWATER)) ||
+		(r_viewleaf->contents==CONTENTS_EMPTY && !(s->flags & SURF_UNDERWATER))))
 	{
 		p = s->polys;
 
