@@ -146,7 +146,7 @@ void CL_PredictMove (void)
 		char		text[1024];
 
 		cls.state = ca_active;
-		sprintf (text, "QuakeWorld: %s", cls.servername);
+		SDL_snprintf (text, sizeof(text), "QuakeWorld: %s", cls.servername);
 		VID_SetTitle(text);
 	}
 

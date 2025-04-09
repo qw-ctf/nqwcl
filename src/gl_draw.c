@@ -409,7 +409,7 @@ void Draw_Init (void)
 		Sys_Error ("Couldn't load gfx/conback.lmp");
 	SwapPic (cb);
 
-	sprintf (ver, "%4.2f", VERSION);
+	SDL_snprintf (ver, sizeof(ver), "%4.2f", VERSION);
 	dest = cb->data + 320 + 320*186 - 11 - 8*strlen(ver);
 	for (x=0 ; x<strlen(ver) ; x++)
 		Draw_CharToConback (ver[x], dest+(x<<3));
@@ -757,11 +757,7 @@ void Draw_ConsoleBackground (int lines)
 //	y = lines-186;
 	y = lines-14;
 	if (!cls.download) {
-#ifdef __linux__
-		sprintf (ver, "LinuxGL (%4.2f) QuakeWorld", LINUX_VERSION);
-#else
-		sprintf (ver, "GL (%4.2f) QuakeWorld", GLQUAKE_VERSION);
-#endif
+		SDL_snprintf (ver, sizeof(ver), "GL (%4.2f) QuakeWorld", GLQUAKE_VERSION);
 		x = vid.conwidth - (strlen(ver)*8 + 11) - (vid.conwidth*8/320)*7;
 		for (i=0 ; i<strlen(ver) ; i++)
 			Draw_Character (x + i * 8, y, ver[i] | 0x80);

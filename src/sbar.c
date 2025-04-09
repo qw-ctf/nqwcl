@@ -486,7 +486,7 @@ void Sbar_SoloScoreboard (void)
 	seconds = cl.time - 60*minutes;
 	tens = seconds / 10;
 	units = seconds - 10*tens;
-	sprintf (str,"Time :%3i:%i%i", minutes, tens, units);
+	SDL_snprintf (str, sizeof(str), "Time :%3i:%i%i", minutes, tens, units);
 	Sbar_DrawString (184, 4, str);
 }
 
@@ -546,7 +546,7 @@ void Sbar_DrawInventory (void)
 // ammo counts
 	for (i=0 ; i<4 ; i++)
 	{
-		sprintf (num, "%3i",cl.stats[STAT_SHELLS+i] );
+		SDL_snprintf (num, sizeof(num), "%3i",cl.stats[STAT_SHELLS+i] );
 		if (headsup) {
 //			Sbar_DrawSubPic(3, -24, sb_ibar, 3, 0, 42,11);
 			Sbar_DrawSubPic((hudswap) ? 0 : (vid.width-42), -24 - (4-i)*11, sb_ibar, 3+(i*48), 0, 42, 11);
@@ -647,7 +647,7 @@ void Sbar_DrawFrags (void)
 
 	// draw number
 		f = s->frags;
-		sprintf (num, "%3i",f);
+		SDL_snprintf (num, sizeof(num), "%3i",f);
 		
 		Sbar_DrawCharacter ( (x+1)*8 , -24, num[0]);
 		Sbar_DrawCharacter ( (x+2)*8 , -24, num[1]);
@@ -806,7 +806,7 @@ void Sbar_Draw (void)
 					Sbar_DrawNormal ();
 
 //					Sbar_DrawString (160-14*8+4,4, "SPECTATOR MODE - TRACK CAMERA");
-				sprintf(st, "Tracking %-.13s, [JUMP] for next",
+				SDL_snprintf(st, sizeof(st), "Tracking %-.13s, [JUMP] for next",
 						cl.players[spec_track].name);
 				Sbar_DrawString(0, -8, st);
 			}
@@ -940,7 +940,7 @@ void Sbar_TeamOverlay (void)
 		if (pavg < 0 || pavg > 999)
 			pavg = 999;
 
-		sprintf (num, "%3i/%3i/%3i", plow, pavg, phigh);
+		SDL_snprintf (num, sizeof(num), "%3i/%3i/%3i", plow, pavg, phigh);
 		Draw_String ( x, y, num);
 
 	// draw team
@@ -949,11 +949,11 @@ void Sbar_TeamOverlay (void)
 		Draw_String (x + 104, y, team);
 
 	// draw total
-		sprintf (num, "%5i", tm->frags);
+		SDL_snprintf (num, sizeof(num), "%5i", tm->frags);
 		Draw_String (x + 104 + 40, y, num);
 		
 	// draw players
-		sprintf (num, "%5i", tm->players);
+		SDL_snprintf (num, sizeof(num), "%5i", tm->players);
 		Draw_String (x + 104 + 88, y, num);
 		
 		if (!strncmp(Info_ValueForKey(cl.players[cl.playernum].userinfo,
@@ -1053,12 +1053,12 @@ void Sbar_DeathmatchOverlay (int start)
 		p = s->ping;
 		if (p < 0 || p > 999)
 			p = 999;
-		sprintf (num, "%4i", p);
+		SDL_snprintf (num, sizeof(num), "%4i", p);
 		Draw_String ( x, y, num);
 
 		// draw pl
 		p = s->pl;
-		sprintf (num, "%3i", p);
+		SDL_snprintf (num, sizeof(num), "%3i", p);
 		if (p > 25)
 			Draw_Alt_String ( x+32, y, num);
 		else
@@ -1083,7 +1083,7 @@ void Sbar_DeathmatchOverlay (int start)
 		else
 			total = realtime - s->entertime;
 		minutes = (int)total/60;
-		sprintf (num, "%4i", minutes);
+		SDL_snprintf (num, sizeof(num), "%4i", minutes);
 		Draw_String ( x+64 , y, num);
 
 		// draw background
@@ -1212,7 +1212,7 @@ void Sbar_MiniDeathmatchOverlay (void)
 
 	// draw number
 		f = s->frags;
-		sprintf (num, "%3i",f);
+		SDL_snprintf (num, sizeof(num), "%3i",f);
 		
 		Draw_Character ( x+8 , y, num[0]);
 		Draw_Character ( x+16, y, num[1]);

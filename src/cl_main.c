@@ -218,7 +218,7 @@ void CL_SendConnectPacket (void)
 	Info_SetValueForStarKey (cls.userinfo, "*ip", NET_AdrToString(adr), MAX_INFO_STRING);
 
 //	Con_Printf ("Connecting to %s...\n", cls.servername);
-	sprintf (data, "%c%c%c%cconnect %i %i %i \"%s\"\n",
+	SDL_snprintf (data, sizeof(data), "%c%c%c%cconnect %i %i %i \"%s\"\n",
 		255, 255, 255, 255,	PROTOCOL_VERSION, cls.qport, cls.challenge, cls.userinfo);
 	NET_SendPacket (strlen(data), data, adr);
 }
@@ -543,9 +543,9 @@ void CL_Color_f (void)
 	if (bottom > 13)
 		bottom = 13;
 	
-	sprintf (num, "%i", top);
+	SDL_snprintf (num, sizeof(num), "%i", top);
 	Cvar_Set ("topcolor", num);
-	sprintf (num, "%i", bottom);
+	SDL_snprintf (num, sizeof(num), "%i", bottom);
 	Cvar_Set ("bottomcolor", num);
 }
 
@@ -628,7 +628,7 @@ void CL_FullInfo_f (void)
 		if (*s)
 			s++;
 
-		if (!stricmp(key, pmodel_name) || !stricmp(key, emodel_name))
+		if (!SDL_strcasecmp(key, pmodel_name) || !SDL_strcasecmp(key, emodel_name))
 			continue;
 
 		Info_SetValueForKey (cls.userinfo, key, value, MAX_INFO_STRING);
@@ -654,7 +654,7 @@ void CL_SetInfo_f (void)
 		Con_Printf ("usage: setinfo [ <key> <value> ]\n");
 		return;
 	}
-	if (!stricmp(Cmd_Argv(1), pmodel_name) || !strcmp(Cmd_Argv(1), emodel_name))
+	if (!SDL_strcasecmp(Cmd_Argv(1), pmodel_name) || !strcmp(Cmd_Argv(1), emodel_name))
 		return;
 
 	Info_SetValueForKey (cls.userinfo, Cmd_Argv(1), Cmd_Argv(2), MAX_INFO_STRING);
@@ -736,7 +736,7 @@ void CL_NextDemo (void)
 		}
 	}
 
-	sprintf (str,"playdemo %s\n", cls.demos[cls.demonum]);
+	SDL_snprintf (str,sizeof(str), "playdemo %s\n", cls.demos[cls.demonum]);
 	Cbuf_InsertText (str);
 	cls.demonum++;
 }
@@ -851,9 +851,9 @@ void CL_ConnectionlessPacket (void)
 
 		s = MSG_ReadString ();
 
-		while (*s && isspace(*s))
+		while (*s && SDL_isspace(*s))
 			s++;
-		while (*s && isspace(s[strlen(s) - 1]))
+		while (*s && SDL_isspace(s[strlen(s) - 1]))
 			s[strlen(s) - 1] = 0;
 
 		if (!allowremotecmd && (!*localid.string || strcmp(localid.string, s))) {
@@ -1000,7 +1000,7 @@ void CL_Download_f (void)
 		return;
 	}
 
-	sprintf (cls.downloadname, "%s/%s", com_gamedir, Cmd_Argv(1));
+	SDL_snprintf (cls.downloadname, sizeof(cls.downloadname), "%s/%s", com_gamedir, Cmd_Argv(1));
 
 	p = cls.downloadname;
 	for (;;) {
@@ -1039,7 +1039,7 @@ void CL_Init (void)
 	Info_SetValueForKey (cls.userinfo, "bottomcolor", "0", MAX_INFO_STRING);
 	Info_SetValueForKey (cls.userinfo, "rate", "50000", MAX_INFO_STRING);
 	Info_SetValueForKey (cls.userinfo, "msg", "1", MAX_INFO_STRING);
-	sprintf (st, "%4.2f-%04d", VERSION, build_number());
+	SDL_snprintf (st, sizeof(st), "%4.2f-%04d", VERSION, build_number());
 	Info_SetValueForStarKey (cls.userinfo, "*ver", st, MAX_INFO_STRING);
 
 	CL_InitInput ();
@@ -1163,7 +1163,7 @@ void Host_EndGame (char *message, ...)
 	char		string[1024];
 	
 	va_start (argptr,message);
-	vsprintf (string,message,argptr);
+	SDL_vsnprintf(string, sizeof(string), message, argptr);
 	va_end (argptr);
 	Con_Printf ("\n===========================\n");
 	Con_Printf ("Host_EndGame: %s\n",string);
@@ -1192,7 +1192,7 @@ void Host_Error (char *error, ...)
 	inerror = true;
 	
 	va_start (argptr,error);
-	vsprintf (string,error,argptr);
+	SDL_vsnprintf(string, sizeof(string), error, argptr);
 	va_end (argptr);
 	Con_Printf ("Host_Error: %s\n",string);
 	

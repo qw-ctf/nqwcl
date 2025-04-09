@@ -32,7 +32,7 @@ extern	int			global_nCmdShow;
 
 extern qboolean			DDActive;
 
-extern DWORD gSndBufSize;
+extern uint32_t gSndBufSize;
 //#define SNDBUFSIZE 65536
 
 

@@ -1082,7 +1082,7 @@ char	*va(char *format, ...)
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	vsprintf (string, format,argptr);
+	SDL_vsnprintf(string, sizeof(string), format, argptr);
 	va_end (argptr);
 
 	return string;	
@@ -1227,7 +1227,7 @@ void COM_WriteFile (char *filename, void *data, int len)
 	FILE	*f;
 	char	name[MAX_OSPATH];
 	
-	sprintf (name, "%s/%s", com_gamedir, filename);
+	SDL_snprintf (name, sizeof(name), "%s/%s", com_gamedir, filename);
 	
 	f = fopen (name, "wb");
 	if (!f) {
@@ -1354,7 +1354,7 @@ int COM_FOpenFile (char *filename, FILE **file)
 					continue;
 			}
 			
-			sprintf (netpath, "%s/%s",search->filename, filename);
+			SDL_snprintf (netpath, sizeof(netpath), "%s/%s",search->filename, filename);
 			
 			findtime = Sys_FileTime (netpath);
 			if (findtime == -1)
@@ -1568,7 +1568,7 @@ void COM_AddGameDirectory (char *dir)
 //
 	for (i=0 ; ; i++)
 	{
-		sprintf (pakfile, "%s/pak%i.pak", dir, i);
+		SDL_snprintf (pakfile, sizeof(pakfile), "%s/pak%i.pak", dir, i);
 		pak = COM_LoadPackFile (pakfile);
 		if (!pak)
 			break;
@@ -1629,7 +1629,7 @@ void COM_Gamedir (char *dir)
 	if (!strcmp(dir,"id1") || !strcmp(dir, "qw"))
 		return;
 
-	sprintf (com_gamedir, "%s/%s", com_basedir, dir);
+	SDL_snprintf (com_gamedir, sizeof(com_gamedir), "%s/%s", com_basedir, dir);
 
 	//
 	// add the directory to the search path
@@ -1644,7 +1644,7 @@ void COM_Gamedir (char *dir)
 	//
 	for (i=0 ; ; i++)
 	{
-		sprintf (pakfile, "%s/pak%i.pak", com_gamedir, i);
+		SDL_snprintf (pakfile, sizeof(pakfile), "%s/pak%i.pak", com_gamedir, i);
 		pak = COM_LoadPackFile (pakfile);
 		if (!pak)
 			break;
@@ -1874,7 +1874,7 @@ void Info_SetValueForStarKey (char *s, char *key, char *value, int maxsize)
 	if (!value || !strlen(value))
 		return;
 
-	sprintf (new, "\\%s\\%s", key, value);
+	SDL_snprintf (new, sizeof(new), "\\%s\\%s", key, value);
 
 	if ((int)(strlen(new) + strlen(s)) > maxsize)
 	{
@@ -1889,12 +1889,12 @@ void Info_SetValueForStarKey (char *s, char *key, char *value, int maxsize)
 	{
 		c = (unsigned char)*v++;
 		// client only allows highbits on name
-		if (stricmp(key, "name") != 0) {
+		if (SDL_strcasecmp(key, "name") != 0) {
 			c &= 127;
 			if (c < 32 || c > 127)
 				continue;
 			// auto lowercase team
-			if (stricmp(key, "team") == 0)
+			if (SDL_strcasecmp(key, "team") == 0)
 				c = tolower(c);
 		}
 //		c &= 127;		// strip high bits
@@ -1995,11 +1995,6 @@ static byte chktbl[1024 + 4] = {
 // map checksum goes here
 0x00,0x00,0x00,0x00
 };
-
-static byte chkbuf[16 + 60 + 4];
-
-static unsigned last_mapchecksum = 0;
-
 
 /*
 ====================

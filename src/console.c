@@ -357,7 +357,7 @@ void Con_Printf (char *fmt, ...)
 	static qboolean	inupdate;
 	
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+	SDL_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 	
 // also echo to debugging console
@@ -403,7 +403,7 @@ void Con_DPrintf (char *fmt, ...)
 		return;			// don't confuse non-developers with techie stuff...
 
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+	SDL_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 	
 	Con_Printf ("%s", msg);
@@ -619,7 +619,7 @@ void Con_DrawConsole (int lines)
 		dlbar[i++] = '\x82';
 		dlbar[i] = 0;
 
-		sprintf(dlbar + strlen(dlbar), " %02d%%", cls.downloadpercent);
+		SDL_snprintf(dlbar + strlen(dlbar), sizeof(dlbar) - SDL_strlen(dlbar),  " %02d%%", cls.downloadpercent);
 
 		// draw it
 		y = con_vislines-22 + 8;
@@ -682,7 +682,7 @@ void Con_SafePrintf (char *fmt, ...)
 	int			temp;
 		
 	va_start (argptr,fmt);
-	vsprintf (msg,fmt,argptr);
+	SDL_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
 	
 	temp = scr_disabled_for_loading;
