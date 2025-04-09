@@ -22,12 +22,6 @@ void CDAudio_Update(void)
 {
 }
 
-LONG CDAudio_MessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return 0;
-}
-
-
 int CDAudio_Init(void)
 {
 	return 0;
