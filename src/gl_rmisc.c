@@ -209,9 +209,6 @@ void R_Init (void)
 	R_InitParticles ();
 	R_InitParticleTexture ();
 
-#ifdef GLTEST
-	Test_Init ();
-#endif
 
 	netgraphtexture = texture_extension_number;
 	texture_extension_number++;
@@ -383,9 +380,6 @@ void R_NewMap (void)
 			mirrortexturenum = i;
  		cl.worldmodel->textures[i]->texturechain = NULL;
 	}
-#ifdef QUAKE2
-	R_LoadSkys ();
-#endif
 }
 
 
