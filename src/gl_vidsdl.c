@@ -155,17 +155,10 @@ void CheckArrayExtensions (void)
 	Sys_Error ("Vertex array extension not present");
 }
 
-//int		texture_mode = GL_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
 int		texture_mode = GL_LINEAR;
-//int		texture_mode = GL_LINEAR_MIPMAP_NEAREST;
-//int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
-
 int		texture_extension_number = 1;
 
-#ifdef _WIN32
-void CheckMultiTextureExtensions(void) 
+void CheckMultiTextureExtensions(void)
 {
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
 		Con_Printf("Multitexture extensions found.\n");
@@ -174,12 +167,6 @@ void CheckMultiTextureExtensions(void)
 		gl_mtexable = true;
 	}
 }
-#else
-void CheckMultiTextureExtensions(void) 
-{
-	gl_mtexable = true;
-}
-#endif
 
 /*
 ===============
