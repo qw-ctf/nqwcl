@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 		Sys_Error ("Not enough memory free; check disk space\n");
 
 // because sound is off until we become active
-	S_BlockSound ();
+	SNDDMA_BlockSound ();
 
 	Sys_Printf ("Host_Init\n");
 	Host_Init (&parms);

@@ -21,14 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-#ifdef _WIN32
-#include "winquake.h"
-#endif
-
 void S_Play(void);
 void S_PlayVol(void);
 void S_SoundList(void);
-void S_Update_();
+void S_Update_(void);
 void S_StopAllSounds(qboolean clear);
 void S_StopAllSoundsC(void);
 
@@ -90,16 +86,6 @@ cvar_t _snd_mixahead = {"_snd_mixahead", "0.1", true};
 // ====================================================================
 
 
-//
-// Fake dma is a synchronous faking of the DMA progress used for
-// isolating performance in the renderer.  The fakedma_updates is
-// number of times S_Update() is called per second.
-//
-
-qboolean fakedma = false;
-int fakedma_updates = 15;
-
-
 void S_AmbientOff (void)
 {
 	snd_ambient = false;
@@ -139,26 +125,13 @@ S_Startup
 
 void S_Startup (void)
 {
-	int		rc;
-
 	if (!snd_initialized)
 		return;
 
-	if (!fakedma)
-	{
-		rc = SNDDMA_Init(&sn);
-
-		if (!rc)
-		{
-#ifndef	_WIN32
-			Con_Printf("S_Startup: SNDDMA_Init failed.\n");
-#endif
-			sound_started = 0;
-			return;
-		}
+	sound_started = SNDDMA_Init(&sn);
+	if (!sound_started) {
+		Con_Printf("S_Startup: SNDDMA_Init failed.\n");
 	}
-
-	sound_started = 1;
 }
 
 
@@ -169,14 +142,10 @@ S_Init
 */
 void S_Init (void)
 {
-
-//	Con_Printf("\nSound Initialization\n");
+	Con_Printf("\nSound Initialization\n");
 
 	if (COM_CheckParm("-nosound"))
 		return;
-
-	if (COM_CheckParm("-simsound"))
-		fakedma = true;
 
 	Cmd_AddCommand("play", S_Play);
 	Cmd_AddCommand("playvol", S_PlayVol);
@@ -202,8 +171,6 @@ void S_Init (void)
 		Con_Printf ("loading all sounds as 8bit\n");
 	}
 
-
-
 	snd_initialized = true;
 
 	S_Startup ();
@@ -212,23 +179,6 @@ void S_Init (void)
 
 	known_sfx = Hunk_AllocName (MAX_SFX*sizeof(sfx_t), "sfx_t");
 	num_sfx = 0;
-
-// create a piece of DMA memory
-
-	if (fakedma)
-	{
-		shm = (void *) Hunk_AllocName(sizeof(*shm), "shm");
-		shm->splitbuffer = 0;
-		shm->samplebits = 16;
-		shm->speed = 22050;
-		shm->channels = 2;
-		shm->samples = 32768;
-		shm->samplepos = 0;
-		shm->soundalive = true;
-		shm->gamealive = true;
-		shm->submission_chunk = 1;
-		shm->buffer = Hunk_AllocName(1<<16, "shmbuf");
-	}
 
 //	Con_Printf ("Sound sampling rate: %i\n", shm->speed);
 
@@ -260,10 +210,7 @@ void S_Shutdown(void)
 	shm = 0;
 	sound_started = 0;
 
-	if (!fakedma)
-	{
-		SNDDMA_Shutdown();
-	}
+	SNDDMA_Shutdown();
 }
 
 

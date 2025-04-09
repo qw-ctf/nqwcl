@@ -153,8 +153,6 @@ extern	int			total_channels;
 // number of times S_Update() is called per second.
 //
 
-extern qboolean 		fakedma;
-extern int 			fakedma_updates;
 extern int		paintedtime;
 extern vec3_t listener_origin;
 extern vec3_t listener_forward;

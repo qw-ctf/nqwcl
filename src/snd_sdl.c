@@ -177,12 +177,12 @@ void SNDDMA_Submit (void)
 	SDL_UnlockAudioStream(stream);
 }
 
-void S_BlockSound (void)
+void SNDDMA_BlockSound (void)
 {
 	SDL_PauseAudioStreamDevice(stream);
 }
 
-void S_UnblockSound (void)
+void SNDDMA_UnblockSound (void)
 {
 	SDL_ResumeAudioStreamDevice(stream);
 }
