@@ -570,7 +570,7 @@ void CL_FullServerinfo_f (void)
 	strcpy (cl.serverinfo, Cmd_Argv(1));
 
 	if ((p = Info_ValueForKey(cl.serverinfo, "*vesion")) && *p) {
-		v = Q_atof(p);
+		v = SDL_atof(p);
 		if (v) {
 			if (!server_version)
 				Con_Printf("Version %1.2f Server\n", v);

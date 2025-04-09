@@ -208,7 +208,7 @@ void *Hunk_AllocName (int size, char *name)
 	
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
-	Q_strncpy (h->name, name, 8);
+	SDL_strlcpy (h->name, name, sizeof(h->name));
 	
 	return (void *)(h+1);
 }
@@ -299,7 +299,7 @@ void *Hunk_HighAllocName (int size, char *name)
 	memset (h, 0, size);
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
-	Q_strncpy (h->name, name, 8);
+	SDL_strlcpy (h->name, name, sizeof(h->name));
 
 	return (void *)(h+1);
 }
@@ -369,9 +369,9 @@ void Cache_Move ( cache_system_t *c)
 	{
 //		Con_Printf ("cache_move ok\n");
 
-		Q_memcpy ( new+1, c+1, c->size - sizeof(cache_system_t) );
+		SDL_memcpy ( new+1, c+1, c->size - sizeof(cache_system_t) );
 		new->user = c->user;
-		Q_memcpy (new->name, c->name, sizeof(new->name));
+		SDL_memcpy (new->name, c->name, sizeof(new->name));
 		Cache_Free (c->user);
 		new->user->data = (void *)(new+1);
 	}

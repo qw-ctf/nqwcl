@@ -34,7 +34,7 @@ cvar_t *Cvar_FindVar (char *var_name)
 	cvar_t	*var;
 	
 	for (var=cvar_vars ; var ; var=var->next)
-		if (!Q_strcmp (var_name, var->name))
+		if (!SDL_strcmp (var_name, var->name))
 			return var;
 
 	return NULL;
@@ -52,7 +52,7 @@ float	Cvar_VariableValue (char *var_name)
 	var = Cvar_FindVar (var_name);
 	if (!var)
 		return 0;
-	return Q_atof (var->string);
+	return SDL_atof (var->string);
 }
 
 
@@ -82,7 +82,7 @@ char *Cvar_CompleteVariable (char *partial)
 	cvar_t		*cvar;
 	int			len;
 	
-	len = Q_strlen(partial);
+	len = SDL_strlen(partial);
 	
 	if (!len)
 		return NULL;
@@ -94,7 +94,7 @@ char *Cvar_CompleteVariable (char *partial)
 
 	// check partial match
 	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-		if (!Q_strncmp (partial,cvar->name, len))
+		if (!SDL_strncmp (partial,cvar->name, len))
 			return cvar->name;
 
 	return NULL;
@@ -130,9 +130,8 @@ void Cvar_Set (char *var_name, char *value)
 	
 	Z_Free (var->string);	// free the old value string
 	
-	var->string = Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (var->string, value);
-	var->value = Q_atof (var->string);
+	var->string = SDL_strdup (value);
+	var->value = SDL_atof (var->string);
 }
 
 /*

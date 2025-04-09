@@ -120,17 +120,13 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	sfxcache_t	*sc;
 	byte	stackbuf[1*1024];		// avoid dirtying the cache heap
 
-// see if still in memory
+    // see if still in memory
 	sc = Cache_Check (&s->cache);
 	if (sc)
 		return sc;
 
-//Con_Printf ("S_LoadSound: %x\n", (int)stackbuf);
-// load it in
-    Q_strcpy(namebuffer, "sound/");
-    Q_strcat(namebuffer, s->name);
-
-//	Con_Printf ("loading %s\n",namebuffer);
+    // load it in
+    SDL_snprintf(namebuffer, sizeof(namebuffer), "sound/%s", s->name);
 
 	data = COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
@@ -226,7 +222,7 @@ void FindNextChunk(char *name)
 		}
 		data_p -= 8;
 		last_chunk = data_p + 8 + ( (iff_chunk_len + 1) & ~1 );
-		if (!Q_strncmp(data_p, name, 4))
+		if (!SDL_strncmp(data_p, name, 4))
 			return;
 	}
 }
@@ -261,7 +257,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 
 // find "RIFF" chunk
 	FindChunk("RIFF");
-	if (!(data_p && !Q_strncmp(data_p+8, "WAVE", 4)))
+	if (!(data_p && !SDL_strncmp(data_p+8, "WAVE", 4)))
 	{
 		Con_Printf("Missing RIFF/WAVE chunks\n");
 		return info;

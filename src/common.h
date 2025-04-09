@@ -26,16 +26,6 @@ typedef unsigned char 		byte;
 #define	MAX_SERVERINFO_STRING	512
 #define	MAX_LOCALINFO_STRING	32768
 
-#define	q_min(a, b)	(((a) < (b)) ? (a) : (b))
-#define	q_max(a, b)	(((a) > (b)) ? (a) : (b))
-#define	CLAMP(_minval, x, _maxval)		\
-	((x) < (_minval) ? (_minval) :		\
-	(x) > (_maxval) ? (_maxval) : (x))
-
-#define LERP(a, b, t) ((a) + ((b)-(a))*(t))
-
-#define countof(arr) (sizeof(arr) / sizeof(arr[0]))
-
 //============================================================================
 
 typedef struct sizebuf_s
@@ -69,26 +59,6 @@ void InsertLinkAfter (link_t *l, link_t *after);
 // ent = STRUCT_FROM_LINK(link,entity_t,order)
 // FIXME: remove this mess!
 #define	STRUCT_FROM_LINK(l,t,m) ((t *)((byte *)l - (int)&(((t *)0)->m)))
-
-//============================================================================
-
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
-#define Q_MAXCHAR ((char)0x7f)
-#define Q_MAXSHORT ((short)0x7fff)
-#define Q_MAXINT	((int)0x7fffffff)
-#define Q_MAXLONG ((int)0x7fffffff)
-#define Q_MAXFLOAT ((int)0x7fffffff)
-
-#define Q_MINCHAR ((char)0x80)
-#define Q_MINSHORT ((short)0x8000)
-#define Q_MININT 	((int)0x80000000)
-#define Q_MINLONG ((int)0x80000000)
-#define Q_MINFLOAT ((int)0x7fffffff)
-
-//============================================================================
 
 extern	bool		bigendien;
 
@@ -133,36 +103,6 @@ float MSG_ReadCoord (void);
 float MSG_ReadAngle (void);
 float MSG_ReadAngle16 (void);
 void MSG_ReadDeltaUsercmd (struct usercmd_s *from, struct usercmd_s *cmd);
-
-//============================================================================
-
-#define Q_memset(d, f, c) memset((d), (f), (c))
-#define Q_memcpy(d, s, c) memcpy((d), (s), (c))
-#define Q_memcmp(m1, m2, c) memcmp((m1), (m2), (c))
-#define Q_strcpy(d, s) strcpy((d), (s))
-#define Q_strncpy(d, s, n) strncpy((d), (s), (n))
-#define Q_strlen(s) ((int)strlen(s))
-#define Q_strrchr(s, c) strrchr((s), (c))
-#define Q_strcat(d, s) strcat((d), (s))
-#define Q_strcmp(s1, s2) strcmp((s1), (s2))
-#define Q_strncmp(s1, s2, n) strncmp((s1), (s2), (n))
-
-#ifdef _WIN32
-
-#define Q_strcasecmp(s1, s2) SDL_strcasecmp((s1), (s2))
-#define Q_strncasecmp(s1, s2, n) SDL_strncasecmp((s1), (s2), (n))
-
-#else
-
-#define Q_strcasecmp(s1, s2) strcasecmp((s1), (s2))
-#define Q_strncasecmp(s1, s2, n) strncasecmp((s1), (s2), (n))
-
-#endif
-
-int	Q_atoi (char *str);
-float Q_atof (char *str);
-
-
 
 //============================================================================
 

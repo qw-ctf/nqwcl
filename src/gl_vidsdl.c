@@ -475,7 +475,7 @@ static void Check_Gamma (unsigned char *pal)
 		else
 			vid_gamma = 0.7; // default to 0.7 on non-3dfx hardware
 	} else
-		vid_gamma = Q_atof(com_argv[i+1]);
+		vid_gamma = SDL_atof(com_argv[i+1]);
 
 	for (i=0 ; i<768 ; i++)
 	{
@@ -512,7 +512,7 @@ void	VID_Init (unsigned char *palette)
 
 	if (COM_CheckParm("-width"))
 	{
-		width = Q_atoi(com_argv[COM_CheckParm("-width")+1]);
+		width = SDL_atoi(com_argv[COM_CheckParm("-width")+1]);
 	}
 	else
 	{
@@ -521,7 +521,7 @@ void	VID_Init (unsigned char *palette)
 
 	if (COM_CheckParm("-height"))
 	{
-		height = Q_atoi(com_argv[COM_CheckParm("-height")+1]);
+		height = SDL_atoi(com_argv[COM_CheckParm("-height")+1]);
 	}
 	else
 	{
@@ -560,7 +560,7 @@ void	VID_Init (unsigned char *palette)
 	SDL_ShowWindow(window);
 
 	if ((i = COM_CheckParm("-conwidth")) != 0)
-		vid.conwidth = Q_atoi(com_argv[i+1]);
+		vid.conwidth = SDL_atoi(com_argv[i+1]);
 	else
 		vid.conwidth = 640;
 
@@ -573,7 +573,7 @@ void	VID_Init (unsigned char *palette)
 	vid.conheight = vid.conwidth*3 / 4;
 
 	if ((i = COM_CheckParm("-conheight")) != 0)
-		vid.conheight = Q_atoi(com_argv[i+1]);
+		vid.conheight = SDL_atoi(com_argv[i+1]);
 	if (vid.conheight < 200)
 		vid.conheight = 200;
 

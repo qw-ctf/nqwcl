@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 		t = COM_CheckParm("-heapsize") + 1;
 
 		if (t < com_argc)
-			parms.memsize = Q_atoi (com_argv[t]) * 1024;
+			parms.memsize = SDL_atoi (com_argv[t]) * 1024;
 	}
 
 	parms.membase = malloc (parms.memsize);
