@@ -1419,25 +1419,11 @@ void Host_Init (quakeparms_t *parms)
 	host_colormap = (byte *)COM_LoadHunkFile ("gfx/colormap.lmp");
 	if (!host_colormap)
 		Sys_Error ("Couldn't load gfx/colormap.lmp");
-#ifdef __linux__
-	IN_Init ();
-	CDAudio_Init ();
-	VID_Init (host_basepal);
-	Draw_Init ();
-	SCR_Init ();
-	R_Init ();
 
-//	S_Init ();		// S_Init is now done as part of VID. Sigh.
-	
-	cls.state = ca_disconnected;
-	Sbar_Init ();
-	CL_Init ();
-#else
 	VID_Init (host_basepal);
 	Draw_Init ();
 	SCR_Init ();
 	R_Init ();
-//	S_Init ();		// S_Init is now done as part of VID. Sigh.
 	S_Init();
 
 	cls.state = ca_disconnected;
@@ -1445,7 +1431,6 @@ void Host_Init (quakeparms_t *parms)
 	Sbar_Init ();
 	CL_Init ();
 	IN_Init ();
-#endif
 
 	Cbuf_InsertText ("exec quake.rc\n");
 	Cbuf_AddText ("echo Type connect <internet address> or use GameSpy to connect to a game.\n");
