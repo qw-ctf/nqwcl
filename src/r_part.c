@@ -457,7 +457,7 @@ void R_DrawParticles (void)
 	unsigned char	theAlpha;
 	vec3_t			up, right;
 	float			scale;
-	qboolean		alphaTestEnabled;
+	bool		alphaTestEnabled;
     
 	GL_Bind(particletexture);
 	alphaTestEnabled = glIsEnabled(GL_ALPHA_TEST);

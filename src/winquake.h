@@ -30,7 +30,7 @@ extern	HINSTANCE	global_hInstance;
 extern	int			global_nCmdShow;
 
 
-extern qboolean			DDActive;
+extern bool			DDActive;
 
 extern uint32_t gSndBufSize;
 //#define SNDBUFSIZE 65536
@@ -41,9 +41,9 @@ typedef enum {MS_WINDOWED, MS_FULLSCREEN, MS_FULLDIB, MS_UNINIT} modestate_t;
 extern modestate_t	modestate;
 
 extern HWND			mainwindow;
-extern qboolean		ActiveApp, Minimized;
+extern bool		ActiveApp, Minimized;
 
-extern qboolean	WinNT;
+extern bool	WinNT;
 
 void IN_ShowMouse (void);
 void IN_DeactivateMouse (void);
@@ -52,11 +52,11 @@ void IN_ActivateMouse (void);
 void IN_MouseEvent (void);
 void IN_Accumulate (float dx, float dy);
 
-extern qboolean	winsock_lib_initialized;
+extern bool	winsock_lib_initialized;
 
 extern int		window_center_x, window_center_y;
 
-extern qboolean	mouseinitialized;
+extern bool	mouseinitialized;
 extern HWND		hwnd_dialog;
 
 extern HANDLE	hinput, houtput;

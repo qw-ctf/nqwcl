@@ -44,8 +44,8 @@ qpic_t	*sb_face_quad;
 qpic_t	*sb_face_invuln;
 qpic_t	*sb_face_invis_invuln;
 
-qboolean	sb_showscores;
-qboolean	sb_showteamscores;
+bool	sb_showscores;
+bool	sb_showteamscores;
 
 extern int			sb_lines;			// scan lines to draw
 
@@ -53,7 +53,7 @@ void Sbar_DeathmatchOverlay (int start);
 void Sbar_TeamOverlay (void);
 void Sbar_MiniDeathmatchOverlay (void);
 
-static qboolean largegame = false;
+static bool largegame = false;
 
 /*
 ===============
@@ -367,7 +367,7 @@ int scoreboardteams;
 Sbar_SortFrags
 ===============
 */
-void Sbar_SortFrags (qboolean includespec)
+void Sbar_SortFrags (bool includespec)
 {
 	int		i, j, k;
 		
@@ -503,8 +503,8 @@ void Sbar_DrawInventory (void)
 	char	num[6];
 	float	time;
 	int		flashon;
-	qboolean	headsup;
-	qboolean    hudswap;
+	bool	headsup;
+	bool    hudswap;
 
 	headsup = !(cl_sbar.value || scr_viewsize.value<100);
 	hudswap = cl_hudswap.value; // Get that nasty float out :)
@@ -767,7 +767,7 @@ Sbar_Draw
 */
 void Sbar_Draw (void)
 {
-	qboolean headsup;
+	bool headsup;
 	char st[512];
 
 	headsup = !(cl_sbar.value || scr_viewsize.value<100);

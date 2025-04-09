@@ -41,7 +41,7 @@ float		con_times[NUM_CON_TIMES];	// realtime time the line was generated
 int			con_vislines;
 int			con_notifylines;		// scan lines to clear for notify lines
 
-qboolean	con_debuglog;
+bool	con_debuglog;
 
 #define		MAXCMDLINE	256
 extern	char	key_lines[32][MAXCMDLINE];
@@ -49,7 +49,7 @@ extern	int		edit_line;
 extern	int		key_linepos;
 		
 
-qboolean	con_initialized;
+bool	con_initialized;
 
 
 void Key_ClearTyping (void)
@@ -354,7 +354,7 @@ void Con_Printf (char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-	static qboolean	inupdate;
+	static bool	inupdate;
 	
 	va_start (argptr,fmt);
 	SDL_vsnprintf (msg, sizeof(msg), fmt, argptr);

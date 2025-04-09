@@ -38,7 +38,7 @@ extern	int			scr_fullupdate;	// set to 0 to force full redraw
 extern	int			sb_lines;
 
 extern	int			clearnotify;	// set to 0 whenever notify text is drawn
-extern	qboolean	scr_disabled_for_loading;
+extern	bool	scr_disabled_for_loading;
 
 extern	cvar_t		scr_viewsize;
 
@@ -48,6 +48,6 @@ extern cvar_t scr_viewsize;
 extern	int			scr_copytop;
 extern	int			scr_copyeverything;
 
-extern qboolean	scr_skipupdate;
+extern bool	scr_skipupdate;
 
-extern qboolean	block_drawing;
+extern bool	block_drawing;

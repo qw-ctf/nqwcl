@@ -69,7 +69,7 @@ static void SDLCALL paint_audio(void *userdata, SDL_AudioStream *stream, int add
 		shm->samplepos = 0;
 }
 
-qboolean SNDDMA_Init (dma_t *dma)
+bool SNDDMA_Init (dma_t *dma)
 {
 	SDL_AudioSpec desired, obtained;
 	int			  tmp, val;

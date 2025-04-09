@@ -74,7 +74,7 @@ typedef struct
 	int		texnum;
 	char	identifier[64];
 	int		width, height;
-	qboolean	mipmap;
+	bool	mipmap;
 } gltexture_t;
 
 #define	MAX_GLTEXTURES	1024
@@ -113,7 +113,7 @@ void GL_Bind (int texnum)
 
 int			scrap_allocated[MAX_SCRAPS][BLOCK_WIDTH];
 byte		scrap_texels[MAX_SCRAPS][BLOCK_WIDTH*BLOCK_HEIGHT*4];
-qboolean	scrap_dirty;
+bool	scrap_dirty;
 int			scrap_texnum;
 
 // returns a texture number and the position inside it
@@ -1047,7 +1047,7 @@ void GL_MipMap8Bit (byte *in, int width, int height)
 GL_Upload32
 ===============
 */
-void GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean alpha)
+void GL_Upload32 (unsigned *data, int width, int height,  bool mipmap, bool alpha)
 {
 	int			samples;
 static	unsigned	scaled[1024*512];	// [512*256];
@@ -1119,10 +1119,10 @@ done: ;
 	}
 }
 
-void GL_Upload8_EXT (byte *data, int width, int height,  qboolean mipmap, qboolean alpha) 
+void GL_Upload8_EXT (byte *data, int width, int height,  bool mipmap, bool alpha)
 {
 	int			i, s;
-	qboolean	noalpha;
+	bool	noalpha;
 	int			samples;
     static	unsigned char scaled[1024*512];	// [512*256];
 	int			scaled_width, scaled_height;
@@ -1212,11 +1212,11 @@ done: ;
 GL_Upload8
 ===============
 */
-void GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean alpha)
+void GL_Upload8 (byte *data, int width, int height,  bool mipmap, bool alpha)
 {
 static	unsigned	trans[640*480];		// FIXME, temporary
 	int			i, s;
-	qboolean	noalpha;
+	bool	noalpha;
 	int			p;
 
 	s = width*height;
@@ -1257,7 +1257,7 @@ static	unsigned	trans[640*480];		// FIXME, temporary
 GL_LoadTexture
 ================
 */
-int GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha)
+int GL_LoadTexture (char *identifier, int width, int height, byte *data, bool mipmap, bool alpha)
 {
 	int			i;
 	gltexture_t	*glt;

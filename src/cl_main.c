@@ -62,7 +62,7 @@ cvar_t	cl_solid_players = {"cl_solid_players", "1"};
 
 cvar_t  localid = {"localid", ""};
 
-static qboolean allowremotecmd = true;
+static bool allowremotecmd = true;
 
 //
 // info mirrors
@@ -101,8 +101,8 @@ double			connect_time = -1;		// for connection retransmits
 
 quakeparms_t host_parms;
 
-qboolean	host_initialized;		// true if into command execution
-qboolean	nomaster;
+bool	host_initialized;		// true if into command execution
+bool	nomaster;
 
 double		host_frametime;
 double		host_rawframetime;
@@ -1185,7 +1185,7 @@ void Host_Error (char *error, ...)
 {
 	va_list		argptr;
 	char		string[1024];
-	static	qboolean inerror = false;
+	static	bool inerror = false;
 	
 	if (inerror)
 		Sys_Error ("Host_Error: recursively entered");
@@ -1457,7 +1457,7 @@ to run quit through here before the final handoff to the sys code.
 */
 void Host_Shutdown(void)
 {
-	static qboolean isdown = false;
+	static bool isdown = false;
 	
 	if (isdown)
 	{

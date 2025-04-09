@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern SDL_Window *window;
 
-qboolean ActiveApp = true;
-qboolean Minimized = false;
+bool ActiveApp = true;
+bool Minimized = false;
 
 int			mouse_buttons;
 int			mouse_oldbuttonstate;
@@ -36,10 +36,10 @@ int			mouse_x, mouse_y, old_mouse_x, old_mouse_y;
 
 float mx_accum, my_accum;
 
-static qboolean	mouseparmsvalid, mouseactivatetoggle;
-static qboolean	mouseshowtoggle = 1;
+static bool	mouseparmsvalid, mouseactivatetoggle;
+static bool	mouseshowtoggle = 1;
 
-qboolean	mouseactive;
+bool	mouseactive;
 
 static float maxpitch = 80.0f;
 static float minpitch = -70.0f;

@@ -173,7 +173,7 @@ Returns true if the bandwidth choke isn't active
 ================
 */
 #define	MAX_BACKUP	200
-qboolean Netchan_CanPacket (netchan_t *chan)
+bool Netchan_CanPacket (netchan_t *chan)
 {
 	if (chan->cleartime < realtime + MAX_BACKUP*chan->rate)
 		return true;
@@ -188,7 +188,7 @@ Netchan_CanReliable
 Returns true if the bandwidth choke isn't 
 ================
 */
-qboolean Netchan_CanReliable (netchan_t *chan)
+bool Netchan_CanReliable (netchan_t *chan)
 {
 	if (chan->reliable_length)
 		return false;			// waiting for ack
@@ -210,7 +210,7 @@ void Netchan_Transmit (netchan_t *chan, int length, byte *data)
 {
 	sizebuf_t	send;
 	byte		send_buf[MAX_MSGLEN + PACKET_HEADER];
-	qboolean	send_reliable;
+	bool	send_reliable;
 	unsigned	w1, w2;
 	int			i;
 
@@ -299,7 +299,7 @@ called when the current net_message is from remote_address
 modifies net_message so that it points to the packet payload
 =================
 */
-qboolean Netchan_Process (netchan_t *chan)
+bool Netchan_Process (netchan_t *chan)
 {
 	unsigned		sequence, sequence_ack;
 	unsigned		reliable_ack, reliable_message;

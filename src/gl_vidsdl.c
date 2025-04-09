@@ -41,8 +41,8 @@ const char *gl_renderer;
 const char *gl_version;
 const char *gl_extensions;
 
-qboolean		DDActive;
-qboolean		scr_skipupdate;
+bool		DDActive;
+bool		scr_skipupdate;
 
 static int		windowed_mouse;
 
@@ -50,7 +50,7 @@ uint32_t		WindowStyle, ExWindowStyle;
 
 
 unsigned char	vid_curpal[256*3];
-static qboolean fullsbardraw = false;
+static bool fullsbardraw = false;
 
 static float vid_gamma = 1.0;
 
@@ -80,8 +80,8 @@ SDL_FunctionPointer glVertexPointerEXT;
 
 typedef void (APIENTRY *lp3DFXFUNC) (int, int, int, int, int, const void*);
 lp3DFXFUNC glColorTableEXT;
-qboolean isPermedia = false;
-qboolean gl_mtexable = false;
+bool isPermedia = false;
+bool gl_mtexable = false;
 
 //====================================
 

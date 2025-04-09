@@ -49,10 +49,10 @@ extern	int		texture_mode;
 
 extern	float	gldepthmin, gldepthmax;
 
-void GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap, qboolean alpha);
-void GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean alpha);
-void GL_Upload8_EXT (byte *data, int width, int height,  qboolean mipmap, qboolean alpha);
-int GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha);
+void GL_Upload32 (unsigned *data, int width, int height,  bool mipmap, bool alpha);
+void GL_Upload8 (byte *data, int width, int height,  bool mipmap, bool alpha);
+void GL_Upload8_EXT (byte *data, int width, int height,  bool mipmap, bool alpha);
+int GL_LoadTexture (char *identifier, int width, int height, byte *data, bool mipmap, bool alpha);
 int GL_FindTexture (char *identifier);
 
 typedef struct
@@ -138,7 +138,7 @@ typedef struct particle_s
 
 
 extern	entity_t	r_worldentity;
-extern	qboolean	r_cache_thrash;		// compatability
+extern	bool	r_cache_thrash;		// compatability
 extern	vec3_t		modelorg, r_entorigin;
 extern	entity_t	*currententity;
 extern	int			r_visframecount;	// ??? what difs?
@@ -163,7 +163,7 @@ extern	mleaf_t		*r_viewleaf, *r_oldviewleaf;
 extern	texture_t	*r_notexture_mip;
 extern	int		d_lightstylevalue[256];	// 8.8 fraction of base light value
 
-extern	qboolean	envmap;
+extern	bool	envmap;
 extern	int	currenttexture;
 extern	int	cnttextures[2];
 extern	int	particletexture;
@@ -208,7 +208,7 @@ extern	cvar_t	gl_max_size;
 extern	cvar_t	gl_playermip;
 
 extern	int			mirrortexturenum;	// quake texturenum, not gltexturenum
-extern	qboolean	mirror;
+extern	bool	mirror;
 extern	mplane_t	*mirror_plane;
 
 extern	float	r_world_matrix[16];
@@ -232,7 +232,7 @@ extern lpMTexFUNC qglMTexCoord2fSGIS;
 extern lpSelTexFUNC qglSelectTextureSGIS;
 #endif
 
-extern qboolean gl_mtexable;
+extern bool gl_mtexable;
 
 void GL_DisableMultitexture(void);
 void GL_EnableMultitexture(void);
@@ -255,7 +255,7 @@ void GL_Set2D (void);
 //
 // gl_rmain.c
 //
-qboolean R_CullBox (vec3_t mins, vec3_t maxs);
+bool R_CullBox (vec3_t mins, vec3_t maxs);
 void R_RotateForEntity (entity_t *e);
 
 //
