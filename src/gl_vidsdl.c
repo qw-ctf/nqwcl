@@ -21,7 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "winquake.h"
+
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl_glext.h>
 
 #define VID_ROW_SIZE	3
 #define WARP_WIDTH		320
@@ -90,9 +92,6 @@ cvar_t		vid_config_x = {"vid_config_x","1280", true};
 cvar_t		vid_config_y = {"vid_config_y","720", true};
 cvar_t		vid_stretch_by_2 = {"vid_stretch_by_2","1", true};
 cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
-
-int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
-SDL_Rect	window_rect;
 
 void VID_ToggleFullscreen(void) {
 	bool windowed = !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN);

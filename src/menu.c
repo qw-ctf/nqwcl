@@ -541,17 +541,10 @@ void M_Options_Draw (void)
 	if (vid_menudrawfn)
 		M_Print (16, 144, "         Video Options");
 
-#ifdef _WIN32
-	if (modestate == MS_WINDOWED)
-	{
-#endif
-		M_Print (16, 152, "             Use Mouse");
-		M_DrawCheckbox (220, 152, _windowed_mouse.value);
-#ifdef _WIN32
-	}
-#endif
+	M_Print (16, 152, "             Use Mouse");
+	M_DrawCheckbox (220, 152, _windowed_mouse.value);
 
-// cursor
+	// cursor
 	M_DrawCharacter (200, 32 + options_cursor*8, 12+((int)(realtime*4)&1));
 }
 
@@ -618,11 +611,7 @@ void M_Options_Key (int k)
 			options_cursor = 0;
 	}
 
-	if ((options_cursor == 15)
-#ifdef _WIN32
-	&& (modestate != MS_WINDOWED)
-#endif
-	)
+	if (options_cursor == 15)
 	{
 		if (k == K_UPARROW)
 			options_cursor = 14;

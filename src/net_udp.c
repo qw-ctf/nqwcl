@@ -21,26 +21,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
+#ifdef _WIN32
+#define MAXHOSTNAMELEN	64
+WSADATA winsockdata;
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <sys/param.h>
 #include <sys/ioctl.h>
-#include <sys/uio.h>
 #include <arpa/inet.h>
 #include <errno.h>
 
-#if defined(sun)
-#include <unistd.h>
-#endif
+#define closesocket close
+#define ioctlsocket ioctl
 
-#ifdef sun
-#include <sys/filio.h>
-#endif
-
-#ifdef NeXT
-#include <libc.h>
 #endif
 
 netadr_t	net_local_adr;
@@ -220,7 +216,7 @@ int UDP_OpenSocket (int port)
 
 	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
 		Sys_Error ("UDP_OpenSocket: socket:", strerror(errno));
-	if (ioctl (newsocket, FIONBIO, (char *)&_true) == -1)
+	if (ioctlsocket (newsocket, FIONBIO, (char *)&_true) == -1)
 		Sys_Error ("UDP_OpenSocket: ioctl FIONBIO:", strerror(errno));
 	address.sin_family = AF_INET;
 //ZOID -- check for interface binding option
@@ -266,6 +262,16 @@ NET_Init
 */
 void NET_Init (int port)
 {
+#ifdef _WIN32
+	WORD wVersionRequested;
+	int r;
+
+	wVersionRequested = MAKEWORD(1, 1);
+	r = WSAStartup (wVersionRequested, &winsockdata);
+	if (r)
+		Sys_Error ("Winsock initialization failed.");
+#endif
+
 	//
 	// open the single socket to be used for all communications
 	//
@@ -292,6 +298,6 @@ NET_Shutdown
 */
 void	NET_Shutdown (void)
 {
-	close (net_socket);
+	closesocket (net_socket);
 }
 
