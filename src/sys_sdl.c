@@ -112,12 +112,10 @@ void Sys_SendKeyEvents (void)
 
 int main(int argc, char **argv)
 {
-   MSG				msg;
 	quakeparms_t	parms;
 	double			time, oldtime, newtime;
 	char			*cwd;
 	int				t;
-	RECT			rect;
 
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
 	{
@@ -179,5 +177,5 @@ int main(int argc, char **argv)
 	SDL_free(cwd);
 
     /* return success of application */
-    return TRUE;
+    return true;
 }

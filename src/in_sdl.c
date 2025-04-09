@@ -32,7 +32,6 @@ qboolean Minimized = false;
 
 int			mouse_buttons;
 int			mouse_oldbuttonstate;
-POINT		current_pos;
 int			mouse_x, mouse_y, old_mouse_x, old_mouse_y;
 
 float mx_accum, my_accum;
