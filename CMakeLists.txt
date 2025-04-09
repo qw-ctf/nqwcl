@@ -33,6 +33,7 @@ else()
             -Werror=format
             -Werror=strict-prototypes
             -Werror=old-style-definition
+            -Werror=incompatible-pointer-types
 
             $<$<CONFIG:Release>:-Werror=unused-function>
             $<$<CONFIG:Release>:-Werror=unused-variable>
@@ -46,6 +47,7 @@ else()
     if(HAS_IMPLICIT_FUNCTION_DECLARATION)
         add_compile_options("-Werror=implicit-function-declaration")
     endif()
+
 endif()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug>)
