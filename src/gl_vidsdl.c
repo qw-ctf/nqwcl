@@ -596,18 +596,8 @@ extern void M_DrawCharacter (int cx, int line, int num);
 extern void M_DrawTransPic (int x, int y, qpic_t *pic);
 extern void M_DrawPic (int x, int y, qpic_t *pic);
 
-typedef struct
-{
-	int		modenum;
-	char	*desc;
-	int		iscur;
-} modedesc_t;
-
 #define MAX_COLUMN_SIZE		9
 #define MODE_AREA_HEIGHT	(MAX_COLUMN_SIZE + 2)
-#define MAX_MODEDESCS		(MAX_COLUMN_SIZE*3)
-
-static modedesc_t	modedescs[MAX_MODEDESCS];
 
 /*
 ================
@@ -618,7 +608,7 @@ void VID_MenuDraw (void)
 {
 	SDL_PixelFormat format;
 	qpic_t		*p;
-	int			i, column, row, w, h, bpp;
+	int			column, row, w, h, bpp;
 	char modestring[64];
 
 	p = Draw_CachePic ("gfx/vidmodes.lmp");
@@ -634,7 +624,7 @@ void VID_MenuDraw (void)
 	bpp = SDL_BITSPERPIXEL(format);
 
 	SDL_snprintf(modestring, sizeof(modestring), "%dx%dx%d", w, h, bpp);
-	M_PrintWhite (column, row, modedescs[i].desc);
+	M_PrintWhite (column, row, modestring);
 
 	M_Print (3*8, 36 + MODE_AREA_HEIGHT * 8 + 8*2,
 			 "Video modes must be set from the");
