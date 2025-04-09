@@ -1,0 +1,81 @@
+name: main
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+#          - os: windows-latest
+#            configurePreset: msvc-x64
+#            buildPreset: msvc-x64-release
+#            name: nqwcl-windows-x64
+#            artifact: "nqwcl.exe"
+          - os: ubuntu-latest
+            configurePreset: static
+            buildPreset: static-release
+            name: nqwcl-linux-x64
+            packages: ["libltdl-dev", "libx11-dev", "libxft-dev", "libxext-dev", "libwayland-dev", "libxkbcommon-dev", "libegl1-mesa-dev", "libpipewire-0.3-dev", "libpulse-dev"]
+            artifact: "nqwcl"
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+
+    steps:
+    - name: Prepare Linux environment
+      run: |
+        sudo apt-get -qq update && sudo apt-get -qq install --no-install-recommends ${{ join(matrix.packages, ' ') }}
+      if: matrix.os == 'ubuntu-latest'
+
+    - name: Check out code
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Set library build type to release
+      shell: bash
+      run: |
+        # Hopefully overrideable via environment in the future. Done here as
+        # vcpkg is chainloaded before cmake, and doesn't seem to apply args.
+        # Avoids building both -dbg and -rel versions of static libraries.
+        for x in {cmake/triplets/*,vcpkg/triplets/{*,community/*}}; do
+          if [[ -f $x ]]; then
+            echo >> $x
+            echo 'set(VCPKG_BUILD_TYPE release)' >> $x
+          fi
+        done
+      if: matrix.os != 'ubuntu-latest'
+
+    - uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: "~3.28.0"
+      if: matrix.os != 'ubuntu-latest'
+
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+      if: matrix.os != 'ubuntu-latest'
+
+    - name: Run CMake
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: ${{ matrix.configurePreset }}
+        buildPreset: ${{ matrix.buildPreset }}
+      env:
+        CFLAGS: ${{ matrix.cflags }}
+
+    - name: Archive client
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.name }}
+        path: |
+          build-${{ matrix.configurePreset }}/Release/${{ matrix.artifact }}
+        compression-level: 9
