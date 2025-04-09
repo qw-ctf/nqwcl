@@ -88,19 +88,10 @@ Netchan_Init
 */
 void Netchan_Init (void)
 {
-	int		port;
-
-	// pick a port value that should be nice and random
-#ifdef _WIN32
-	port = ((int)(timeGetTime()*1000) * time(NULL)) & 0xffff;
-#else
-	port = ((int)(getpid()+getuid()*1000) * time(NULL)) & 0xffff;
-#endif
-
 	Cvar_RegisterVariable (&showpackets);
 	Cvar_RegisterVariable (&showdrop);
 	Cvar_RegisterVariable (&qport);
-	Cvar_SetValue("qport", port);
+	Cvar_SetValue("qport", (float) SDL_rand(UINT16_MAX));
 }
 
 /*
