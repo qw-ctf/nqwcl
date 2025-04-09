@@ -21,45 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "winquake.h"
-#include <commctrl.h>
 #include <SDL3/SDL.h>
 
-#define MAX_MODE_LIST	30
 #define VID_ROW_SIZE	3
 #define WARP_WIDTH		320
 #define WARP_HEIGHT		200
 #define MAXWIDTH		10000
 #define MAXHEIGHT		10000
-#define BASEWIDTH		320
-#define BASEHEIGHT		200
-
-#define MODE_WINDOWED			0
-#define NO_MODE					(MODE_WINDOWED - 1)
-#define MODE_FULLSCREEN_DEFAULT	(MODE_WINDOWED + 1)
-
-typedef struct {
-	modestate_t	type;
-	int			width;
-	int			height;
-	int			modenum;
-	int			dib;
-	int			fullscreen;
-	int			bpp;
-	int			halfscreen;
-	char		modedesc[17];
-} vmode_t;
-
-typedef struct {
-	int			width;
-	int			height;
-} lmode_t;
-
-lmode_t	lowresmodes[] = {
-	{320, 200},
-	{320, 240},
-	{400, 300},
-	{512, 384},
-};
+#define BASEWIDTH		1280
+#define BASEHEIGHT		720
 
 SDL_Window *window = NULL;
 SDL_GLContext context;
@@ -72,30 +42,11 @@ const char *gl_extensions;
 qboolean		DDActive;
 qboolean		scr_skipupdate;
 
-static vmode_t	modelist[MAX_MODE_LIST];
-static int		nummodes;
-static vmode_t	*pcurrentmode;
-static vmode_t	badmode;
-
-static DEVMODE	gdevmode;
-static qboolean	vid_initialized = false;
-static qboolean	windowed, leavecurrentmode;
-static qboolean vid_canalttab = false;
-static qboolean vid_wassuspended = false;
 static int		windowed_mouse;
-extern qboolean	mouseactive;  // from in_win.c
-static HICON	hIcon;
 
-int			DIBWidth, DIBHeight;
-RECT		WindowRect;
-DWORD		WindowStyle, ExWindowStyle;
+uint32_t		WindowStyle, ExWindowStyle;
 
-HWND	mainwindow, dibwindow;
 
-int			vid_modenum = NO_MODE;
-int			vid_realmode;
-int			vid_default = MODE_WINDOWED;
-static int	windowed_default;
 unsigned char	vid_curpal[256*3];
 static qboolean fullsbardraw = false;
 
@@ -113,22 +64,17 @@ unsigned char d_15to8table[65536];
 
 float		gldepthmin, gldepthmax;
 
-modestate_t	modestate = MS_UNINIT;
-
 void VID_MenuDraw (void);
 void VID_MenuKey (int key);
 
-LONG WINAPI MainWndProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-void AppActivate(BOOL fActive, BOOL minimize);
 char *VID_GetModeDescription (int mode);
 void ClearAllStates (void);
-void VID_UpdateWindowStatus (void);
 void GL_Init (void);
 
-PROC glArrayElementEXT;
-PROC glColorPointerEXT;
-PROC glTexCoordPointerEXT;
-PROC glVertexPointerEXT;
+SDL_FunctionPointer glArrayElementEXT;
+SDL_FunctionPointer glColorPointerEXT;
+SDL_FunctionPointer glTexCoordPointerEXT;
+SDL_FunctionPointer glVertexPointerEXT;
 
 typedef void (APIENTRY *lp3DFXFUNC) (int, int, int, int, int, const void*);
 lp3DFXFUNC glColorTableEXT;
@@ -137,13 +83,8 @@ qboolean gl_mtexable = false;
 
 //====================================
 
-cvar_t		vid_mode = {"vid_mode","0", false};
-// Note that 0 is MODE_WINDOWED
-cvar_t		_vid_default_mode = {"_vid_default_mode","0", true};
-// Note that 3 is MODE_FULLSCREEN_DEFAULT
-cvar_t		_vid_default_mode_win = {"_vid_default_mode_win","3", true};
 cvar_t		vid_wait = {"vid_wait","0"};
-cvar_t		vid_nopageflip = {"vid_nopageflip","0", true};
+cvar_t		vid_vsync = {"vid_nopageflip","0", true};
 cvar_t		_vid_wait_override = {"_vid_wait_override", "0", true};
 cvar_t		vid_config_x = {"vid_config_x","1280", true};
 cvar_t		vid_config_y = {"vid_config_y","720", true};
@@ -151,28 +92,11 @@ cvar_t		vid_stretch_by_2 = {"vid_stretch_by_2","1", true};
 cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
 
 int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
-RECT		window_rect;
-
-void VID_SetWindowedMode (qboolean fullscreen)
-{
-	SDL_SetWindowFullscreen(window, fullscreen);
-	modestate = fullscreen ? MS_FULLSCREEN : MS_WINDOWED;
-}
+SDL_Rect	window_rect;
 
 void VID_ToggleFullscreen(void) {
-	VID_SetWindowedMode(modestate == MS_WINDOWED);
-}
-
-
-void VID_UpdateWindowStatus (void)
-{
-
-	window_rect.left = window_x;
-	window_rect.top = window_y;
-	window_rect.right = window_x + window_width;
-	window_rect.bottom = window_y + window_height;
-	window_center_x = (window_rect.left + window_rect.right) / 2;
-	window_center_y = (window_rect.top + window_rect.bottom) / 2;
+	bool windowed = !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN);
+	SDL_SetWindowFullscreen(window, windowed);
 }
 
 void VID_SetTitle(const char *title)
@@ -197,26 +121,11 @@ BINDTEXFUNCPTR bindTexFunc;
 
 void CheckTextureExtensions (void)
 {
-	char		*tmp;
-	qboolean	texture_ext;
-	HINSTANCE	hInstGL;
-
-	texture_ext = FALSE;
-	/* check for texture extension */
-	tmp = (unsigned char *)glGetString(GL_EXTENSIONS);
-	while (*tmp)
-	{
-		if (strncmp((const char*)tmp, TEXTURE_EXT_STRING, strlen(TEXTURE_EXT_STRING)) == 0)
-			texture_ext = TRUE;
-		tmp++;
-	}
-
-
-/* load library and get procedure adresses for texture extension API */
-	if ((bindTexFunc = (BINDTEXFUNCPTR) SDL_GL_GetProcAddress("glBindTextureEXT")) == NULL)
-	{
-		Sys_Error ("GetProcAddress for BindTextureEXT failed");
-		return;
+	if (SDL_GL_ExtensionSupported("GL_EXT_texture_object")) {
+		// load library and get procedure adresses for texture extension API
+		if ((bindTexFunc = (BINDTEXFUNCPTR) SDL_GL_GetProcAddress("glBindTextureEXT")) == NULL) {
+			Sys_Error ("GetProcAddress for BindTextureEXT failed");
+		}
 	}
 }
 
@@ -231,10 +140,10 @@ void CheckArrayExtensions (void)
 		if (strncmp((const char*)tmp, "GL_EXT_vertex_array", strlen("GL_EXT_vertex_array")) == 0)
 		{
 			if (
-((glArrayElementEXT = (PROC) SDL_GL_GetProcAddress("glArrayElementEXT")) == NULL) ||
-((glColorPointerEXT = (PROC) SDL_GL_GetProcAddress("glColorPointerEXT")) == NULL) ||
-((glTexCoordPointerEXT = (PROC) SDL_GL_GetProcAddress("glTexCoordPointerEXT")) == NULL) ||
-((glVertexPointerEXT = (PROC) SDL_GL_GetProcAddress("glVertexPointerEXT")) == NULL) )
+((glArrayElementEXT = SDL_GL_GetProcAddress("glArrayElementEXT")) == NULL) ||
+((glColorPointerEXT = SDL_GL_GetProcAddress("glColorPointerEXT")) == NULL) ||
+((glTexCoordPointerEXT = SDL_GL_GetProcAddress("glTexCoordPointerEXT")) == NULL) ||
+((glVertexPointerEXT = SDL_GL_GetProcAddress("glVertexPointerEXT")) == NULL) )
 			{
 				Sys_Error ("GetProcAddress for vertex extension failed");
 				return;
@@ -269,7 +178,7 @@ void CheckMultiTextureExtensions(void)
 #else
 void CheckMultiTextureExtensions(void) 
 {
-		gl_mtexable = true;
+	gl_mtexable = true;
 }
 #endif
 
@@ -289,14 +198,6 @@ void GL_Init (void)
 	Con_Printf ("GL_VERSION: %s\n", gl_version);
 	gl_extensions = glGetString (GL_EXTENSIONS);
 	Con_Printf ("GL_EXTENSIONS: %s\n", gl_extensions);
-
-//	Con_Printf ("%s %s\n", gl_renderer, gl_version);
-
-    if (strnicmp(gl_renderer,"PowerVR",7)==0)
-         fullsbardraw = true;
-
-    if (strnicmp(gl_renderer,"Permedia",8)==0)
-         isPermedia = true;
 
 	CheckTextureExtensions ();
 	CheckMultiTextureExtensions ();
@@ -344,8 +245,8 @@ void GL_EndRendering (void)
 		SDL_GL_SwapWindow(window);
 	}
 
-// handle the mouse state when windowed if that's changed
-	if (modestate == MS_WINDOWED)
+	// handle the mouse state when windowed if that's changed
+	if (!(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN))
 	{
 		if (!_windowed_mouse.value) {
 			if (windowed_mouse)	{
@@ -374,17 +275,13 @@ void	VID_SetPalette (unsigned char *palette)
 	unsigned r,g,b;
 	unsigned v;
 	int     r1,g1,b1;
-	int		j,k,l,m;
+	int		j,k,l;
 	unsigned short i;
 	unsigned	*table;
-	FILE *f;
-	char s[255];
-	HWND hDlg, hProgress;
-	float gamma;
 
-//
-// 8 8 8 encoding
-//
+	//
+	// 8 8 8 encoding
+	//
 	pal = palette;
 	table = d_8to24table;
 	for (i=0 ; i<256 ; i++)
@@ -393,9 +290,6 @@ void	VID_SetPalette (unsigned char *palette)
 		g = pal[1];
 		b = pal[2];
 		pal += 3;
-		
-//		v = (255<<24) + (r<<16) + (g<<8) + (b<<0);
-//		v = (255<<0) + (r<<8) + (g<<16) + (b<<24);
 		v = (255<<24) + (r<<0) + (g<<8) + (b<<16);
 		*table++ = v;
 	}
@@ -428,15 +322,11 @@ void	VID_SetPalette (unsigned char *palette)
 	}
 }
 
-BOOL	gammaworks;
+bool	gammaworks;
 
-void	VID_ShiftPalette (unsigned char *palette)
+void VID_ShiftPalette (unsigned char *palette)
 {
-	extern	byte ramps[3][256];
-	
 	VID_SetPalette (palette);
-
-//	gammaworks = SetDeviceGammaRamp (maindc, ramps);
 }
 
 
@@ -448,9 +338,8 @@ void VID_SetDefaultMode (void)
 
 void VID_Shutdown (void)
 {
-	if (vid_initialized)
+	if (window)
 	{
-		vid_canalttab = false;
 		SDL_GL_DestroyContext(context);
 		SDL_DestroyWindow(window);
 	}
@@ -484,17 +373,8 @@ void ClearAllStates (void)
 	IN_ClearStates ();
 }
 
+/*
 void AppActivate(BOOL fActive, BOOL minimize)
-/****************************************************************************
-*
-* Function:     AppActivate
-* Parameters:   fActive - True if app is activating
-*
-* Description:  If the application is activating, then swap the system
-*               into SYSPAL_NOSTATIC mode so that our palettes will display
-*               correctly.
-*
-****************************************************************************/
 {
 	MSG msg;
     HDC			hdc;
@@ -553,6 +433,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 		}
 	}
 }
+*/
 
 void VID_WindowResized(void) {
 	SDL_GetWindowSizeInPixels(window, &vid.width, &vid.height);
@@ -563,163 +444,6 @@ void VID_WindowResized(void) {
 	Draw_AdjustConsoleBackground();
 }
 
-
-
-/* main window procedure
-LONG WINAPI MainWndProc (
-    HWND    hWnd,
-    UINT    uMsg,
-    WPARAM  wParam,
-    LPARAM  lParam)
-{
-    LONG    lRet = 1;
-	int		fwKeys, xPos, yPos, fActive, fMinimized, temp;
-	extern unsigned int uiWheelMessage;
-
-
-	if ( uMsg == uiWheelMessage )
-		uMsg = WM_MOUSEWHEEL;
-
-    switch (uMsg)
-    {
-		case WM_KILLFOCUS:
-			if (modestate == MS_FULLDIB)
-				ShowWindow(mainwindow, SW_SHOWMINNOACTIVE);
-			break;
-
-		case WM_CREATE:
-			break;
-
-		case WM_MOVE:
-			window_x = (int) LOWORD(lParam);
-			window_y = (int) HIWORD(lParam);
-			VID_UpdateWindowStatus ();
-			break;
-
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
-			Key_Event (MapKey(lParam), true);
-			break;
-			
-		case WM_KEYUP:
-		case WM_SYSKEYUP:
-			Key_Event (MapKey(lParam), false);
-			break;
-
-		case WM_SYSCHAR:
-		// keep Alt-Space from happening
-			break;
-
-	// this is complicated because Win32 seems to pack multiple mouse events into
-	// one update sometimes, so we always check all states and look for events
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-		case WM_MOUSEMOVE:
-			temp = 0;
-
-			if (wParam & MK_LBUTTON)
-				temp |= 1;
-
-			if (wParam & MK_RBUTTON)
-				temp |= 2;
-
-			if (wParam & MK_MBUTTON)
-				temp |= 4;
-
-			IN_MouseEvent (temp);
-
-			break;
-
-		// JACK: This is the mouse wheel with the Intellimouse
-		// Its delta is either positive or neg, and we generate the proper
-		// Event.
-		case WM_MOUSEWHEEL: 
-			if ((short) HIWORD(wParam) > 0) {
-				Key_Event(K_MWHEELUP, true);
-				Key_Event(K_MWHEELUP, false);
-			} else {
-				Key_Event(K_MWHEELDOWN, true);
-				Key_Event(K_MWHEELDOWN, false);
-			}
-			break;
-
-    	case WM_SIZE:
-            break;
-
-   	    case WM_CLOSE:
-			if (MessageBox (mainwindow, "Are you sure you want to quit?", "Confirm Exit",
-						MB_YESNO | MB_SETFOREGROUND | MB_ICONQUESTION) == IDYES)
-			{
-				Sys_Quit ();
-			}
-
-	        break;
-
-		case WM_ACTIVATE:
-			fActive = LOWORD(wParam);
-			fMinimized = (BOOL) HIWORD(wParam);
-			AppActivate(!(fActive == WA_INACTIVE), fMinimized);
-
-		// fix the leftover Alt from any Alt-Tab or the like that switched us away
-			ClearAllStates ();
-
-			break;
-
-   	    case WM_DESTROY:
-        {
-			if (dibwindow)
-				DestroyWindow (dibwindow);
-
-            PostQuitMessage (0);
-        }
-        break;
-
-		case MM_MCINOTIFY:
-            lRet = CDAudio_MessageHandler (hWnd, uMsg, wParam, lParam);
-			break;
-
-    	default:
-            // pass all unhandled messages to DefWindowProc
-            lRet = DefWindowProc (hWnd, uMsg, wParam, lParam);
-        break;
-    }
-
-    // return 1 if handled message, 0 if not
-    return lRet;
-}
-*/
-
-
-/*
-=================
-VID_NumModes
-=================
-*/
-int VID_NumModes (void)
-{
-	return nummodes;
-}
-
-	
-/*
-=================
-VID_GetModePtr
-=================
-*/
-vmode_t *VID_GetModePtr (int modenum)
-{
-
-	if ((modenum >= 0) && (modenum < nummodes))
-		return &modelist[modenum];
-	else
-		return &badmode;
-}
-
-
 /*
 =================
 VID_GetModeDescription
@@ -727,136 +451,16 @@ VID_GetModeDescription
 */
 char *VID_GetModeDescription (int mode)
 {
-	char		*pinfo;
-	vmode_t		*pv;
-	static char	temp[100];
+	static char	modestring[100];
+	int w, h;
 
-	if ((mode < 0) || (mode >= nummodes))
-		return NULL;
-
-	if (!leavecurrentmode)
-	{
-		pv = VID_GetModePtr (mode);
-		pinfo = pv->modedesc;
-	}
-	else
-	{
-		sprintf (temp, "Desktop resolution (%dx%d)",
-				 modelist[MODE_FULLSCREEN_DEFAULT].width,
-				 modelist[MODE_FULLSCREEN_DEFAULT].height);
-		pinfo = temp;
+	if (!SDL_GetWindowSize(window, &w, &h)) {
+		Sys_Error("Could not query window size");
 	}
 
-	return pinfo;
-}
+	SDL_snprintf (modestring, sizeof(modestring), "Desktop resolution (%dx%d)", w, h);
 
-
-// KJB: Added this to return the mode driver name in description for console
-
-char *VID_GetExtModeDescription (int mode)
-{
-	static char	pinfo[40];
-	vmode_t		*pv;
-
-	if ((mode < 0) || (mode >= nummodes))
-		return NULL;
-
-	pv = VID_GetModePtr (mode);
-	if (modelist[mode].type == MS_FULLDIB)
-	{
-		if (!leavecurrentmode)
-		{
-			sprintf(pinfo,"%s fullscreen", pv->modedesc);
-		}
-		else
-		{
-			sprintf (pinfo, "Desktop resolution (%dx%d)",
-					 modelist[MODE_FULLSCREEN_DEFAULT].width,
-					 modelist[MODE_FULLSCREEN_DEFAULT].height);
-		}
-	}
-	else
-	{
-		if (modestate == MS_WINDOWED)
-			sprintf(pinfo, "%s windowed", pv->modedesc);
-		else
-			sprintf(pinfo, "windowed");
-	}
-
-	return pinfo;
-}
-
-
-/*
-=================
-VID_DescribeCurrentMode_f
-=================
-*/
-void VID_DescribeCurrentMode_f (void)
-{
-	Con_Printf ("%s\n", VID_GetExtModeDescription (vid_modenum));
-}
-
-
-/*
-=================
-VID_NumModes_f
-=================
-*/
-void VID_NumModes_f (void)
-{
-
-	if (nummodes == 1)
-		Con_Printf ("%d video mode is available\n", nummodes);
-	else
-		Con_Printf ("%d video modes are available\n", nummodes);
-}
-
-
-/*
-=================
-VID_DescribeMode_f
-=================
-*/
-void VID_DescribeMode_f (void)
-{
-	int		t, modenum;
-	
-	modenum = Q_atoi (Cmd_Argv(1));
-
-	t = leavecurrentmode;
-	leavecurrentmode = 0;
-
-	Con_Printf ("%s\n", VID_GetExtModeDescription (modenum));
-
-	leavecurrentmode = t;
-}
-
-
-/*
-=================
-VID_DescribeModes_f
-=================
-*/
-void VID_DescribeModes_f (void)
-{
-	int			i, lnummodes, t;
-	char		*pinfo;
-	vmode_t		*pv;
-
-	lnummodes = VID_NumModes ();
-
-	t = leavecurrentmode;
-	leavecurrentmode = 0;
-
-	for (i=1 ; i<lnummodes ; i++)
-	{
-		pv = VID_GetModePtr (i);
-		pinfo = VID_GetExtModeDescription (i);
-		Con_Printf ("%2d: %s\n", i, pinfo);
-	}
-
-	leavecurrentmode = t;
+	return modestring;
 }
 
 static void Check_Gamma (unsigned char *pal)
@@ -898,27 +502,14 @@ void	VID_Init (unsigned char *palette)
 	int		i;
 	int		width, height;
 
-	DEVMODE	devmode;
-
-	memset(&devmode, 0, sizeof(devmode));
-
-	Cvar_RegisterVariable (&vid_mode);
 	Cvar_RegisterVariable (&vid_wait);
-	Cvar_RegisterVariable (&vid_nopageflip);
+	Cvar_RegisterVariable (&vid_vsync);
 	Cvar_RegisterVariable (&_vid_wait_override);
-	Cvar_RegisterVariable (&_vid_default_mode);
-	Cvar_RegisterVariable (&_vid_default_mode_win);
 	Cvar_RegisterVariable (&vid_config_x);
 	Cvar_RegisterVariable (&vid_config_y);
 	Cvar_RegisterVariable (&vid_stretch_by_2);
 	Cvar_RegisterVariable (&_windowed_mouse);
 	Cvar_RegisterVariable (&gl_ztrick);
-
-	Cmd_AddCommand ("vid_nummodes", VID_NumModes_f);
-	Cmd_AddCommand ("vid_describecurrentmode", VID_DescribeCurrentMode_f);
-	Cmd_AddCommand ("vid_describemode", VID_DescribeMode_f);
-	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
-
 
 	if (COM_CheckParm("-width"))
 	{
@@ -966,23 +557,8 @@ void	VID_Init (unsigned char *palette)
 	}
 
 	SDL_GL_MakeCurrent(window, context);
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval((int) vid_vsync.value);
 	SDL_ShowWindow(window);
-
-	if (true || COM_CheckParm("-window"))
-	{
-		// TODO: Windowed vs fullscreen
-
-		windowed = true;
-
-		vid_default = MODE_WINDOWED;
-	}
-	else
-	{
-		// TODO: fullscreen
-	}
-
-	vid_initialized = true;
 
 	if ((i = COM_CheckParm("-conwidth")) != 0)
 		vid.conwidth = Q_atoi(com_argv[i+1]);
@@ -1013,17 +589,10 @@ void	VID_Init (unsigned char *palette)
 	vid.conwidth = vid.width;
 	vid.conheight = vid.height;
 
-	modestate = MS_WINDOWED;
-
 	GL_Init ();
-
-	vid_realmode = vid_modenum;
 
 	vid_menudrawfn = VID_MenuDraw;
 	vid_menukeyfn = VID_MenuKey;
-
-	strcpy (badmode.modedesc, "Bad mode");
-	vid_canalttab = true;
 
 	if (COM_CheckParm("-fullsbar"))
 		fullsbardraw = true;
@@ -1063,59 +632,25 @@ VID_MenuDraw
 */
 void VID_MenuDraw (void)
 {
+	SDL_PixelFormat format;
 	qpic_t		*p;
-	char		*ptr;
-	int			lnummodes, i, j, k, column, row, dup, dupmode;
-	char		temp[100];
-	vmode_t		*pv;
+	int			i, column, row, w, h, bpp;
+	char modestring[64];
 
 	p = Draw_CachePic ("gfx/vidmodes.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
 
-	vid_wmodes = 0;
-	lnummodes = VID_NumModes ();
-	
-	for (i=1 ; (i<lnummodes) && (vid_wmodes < MAX_MODEDESCS) ; i++)
-	{
-		ptr = VID_GetModeDescription (i);
-		pv = VID_GetModePtr (i);
+	M_Print (2*8, 36+0*8, "Fullscreen Modes (WIDTHxHEIGHTxBPP)");
 
-		k = vid_wmodes;
+	column = 8;
+	row = 36+2*8;
 
-		modedescs[k].modenum = i;
-		modedescs[k].desc = ptr;
-		modedescs[k].iscur = 0;
+	SDL_GetWindowSize(window, &w, &h);
+	format = SDL_GetWindowPixelFormat(window);
+	bpp = SDL_BITSPERPIXEL(format);
 
-		if (i == vid_modenum)
-			modedescs[k].iscur = 1;
-
-		vid_wmodes++;
-
-	}
-
-	if (vid_wmodes > 0)
-	{
-		M_Print (2*8, 36+0*8, "Fullscreen Modes (WIDTHxHEIGHTxBPP)");
-
-		column = 8;
-		row = 36+2*8;
-
-		for (i=0 ; i<vid_wmodes ; i++)
-		{
-			if (modedescs[i].iscur)
-				M_PrintWhite (column, row, modedescs[i].desc);
-			else
-				M_Print (column, row, modedescs[i].desc);
-
-			column += 13*8;
-
-			if ((i % VID_ROW_SIZE) == (VID_ROW_SIZE - 1))
-			{
-				column = 8;
-				row += 8;
-			}
-		}
-	}
+	SDL_snprintf(modestring, sizeof(modestring), "%dx%dx%d", w, h, bpp);
+	M_PrintWhite (column, row, modedescs[i].desc);
 
 	M_Print (3*8, 36 + MODE_AREA_HEIGHT * 8 + 8*2,
 			 "Video modes must be set from the");
