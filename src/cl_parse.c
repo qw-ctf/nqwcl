@@ -549,7 +549,7 @@ void CL_ParseServerData (void)
 	//ZOID--run the autoexec.cfg in the gamedir
 	//if it exists
 	if (cflag) {
-		SDL_snprintf(fn, "%s/%s", com_gamedir, "config.cfg");
+		SDL_snprintf(fn, sizeof(fn), "%s/%s", com_gamedir, "config.cfg");
 		if ((f = fopen(fn, "r")) != NULL) {
 			fclose(f);
 			Cbuf_AddText ("cl_warncmd 0\n");
