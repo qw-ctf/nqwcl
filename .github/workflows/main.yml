@@ -14,11 +14,11 @@ jobs:
     strategy:
       matrix:
         include:
-#          - os: windows-latest
-#            configurePreset: msvc-x64
-#            buildPreset: msvc-x64-release
-#            name: nqwcl-windows-x64
-#            artifact: "nqwcl.exe"
+          - os: windows-latest
+            configurePreset: msvc-x64
+            buildPreset: msvc-x64-release
+            name: nqwcl-windows-x64
+            artifact: "nqwcl.exe"
           - os: ubuntu-latest
             configurePreset: static
             buildPreset: static-release

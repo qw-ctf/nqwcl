@@ -14,8 +14,24 @@ endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 add_compile_options(
         /nologo
-        /W2
+        /W3
         /WX
+
+        # code base is complete trash, hide stuff
+
+        # type conversion warnings
+        /wd4244
+        # truncation from double to float
+        /wd4305
+        # loss of data via size_t to int
+        /wd4267
+        # unsafe functions, should be fixed, there are platform independent SDL_* alternatives
+        /wd4996
+        # signed and unsigned comparison, ooof
+        /wd4018
+
+
+
         /diagnostics:column
 )
 else()
