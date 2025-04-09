@@ -47,7 +47,7 @@ qpic_t	*sb_face_invis_invuln;
 qboolean	sb_showscores;
 qboolean	sb_showteamscores;
 
-int			sb_lines;			// scan lines to draw
+extern int			sb_lines;			// scan lines to draw
 
 void Sbar_DeathmatchOverlay (int start);
 void Sbar_TeamOverlay (void);

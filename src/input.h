@@ -19,6 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // input.h -- external (non-keyboard) input devices
 
+extern qboolean ActiveApp;
+extern qboolean Minimized;
+extern qboolean	mouseactive;
+
 void IN_Init (void);
 
 void IN_Shutdown (void);
