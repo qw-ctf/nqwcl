@@ -3,6 +3,7 @@
   "name": "nqwcl",
   "version": "1.0.0",
   "dependencies": [
-    { "name": "sdl3", "default-features": false }
+    { "name": "sdl3", "default-features": false, "platform": "windows, osx" },
+    { "name": "sdl3", "default-features": false, "features": ["wayland", "x11", "alsa"], "platform": "linux" }
   ]
 }

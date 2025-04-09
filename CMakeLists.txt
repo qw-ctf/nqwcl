@@ -3,18 +3,50 @@ cmake_minimum_required(VERSION 3.20)
 project(nqwcl C)
 
 include(CheckIPOSupported)
+include(CheckCCompilerFlag)
+
 check_ipo_supported(RESULT USE_LTO)
 if(USE_LTO)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE)
 endif()
 
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 add_compile_options(
         /nologo
         /W2
         /WX
         /diagnostics:column
 )
+else()
+    add_compile_options(
+            -std=gnu89
+
+            -Wall
+            -Wno-pointer-to-int-cast
+            -Wno-int-to-pointer-cast
+            -Wno-strict-aliasing
+            -Wno-deprecated-declarations
+
+            -fvisibility=hidden
+
+            -Werror=format
+            -Werror=strict-prototypes
+            -Werror=old-style-definition
+
+            $<$<CONFIG:Release>:-Werror=unused-function>
+            $<$<CONFIG:Release>:-Werror=unused-variable>
+    )
+
+    check_c_compiler_flag("-Wstrlcpy-strlcat-size" HAS_STRLCPY_STRLCAT_SIZE)
+    if(HAS_STRLCPY_STRLCAT_SIZE)
+        add_compile_options("-Werror=strlcpy-strlcat-size")
+    endif()
+    check_c_compiler_flag("-Wimplicit-function-declaration" HAS_IMPLICIT_FUNCTION_DECLARATION)
+    if(HAS_IMPLICIT_FUNCTION_DECLARATION)
+        add_compile_options("-Werror=implicit-function-declaration")
+    endif()
+endif()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug>)
 set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:ProgramDatabase>)
@@ -49,7 +81,7 @@ set(SOURCES
         "src/gl_rmisc.c"
         "src/gl_rsurf.c"
         "src/gl_screen.c"
-        "src/gl_vidnt.c"
+        "src/gl_vidsdl.c"
         "src/gl_warp.c"
         "src/in_sdl.c"
         "src/keys.c"
@@ -57,7 +89,7 @@ set(SOURCES
         "src/md4.c"
         "src/menu.c"
         "src/net_chan.c"
-        "src/net_wins.c"
+        "src/net_udp.c"
         "src/pmove.c"
         "src/pmovetst.c"
         "src/r_part.c"
@@ -125,8 +157,8 @@ add_definitions(-DGLQUAKE)
 
 add_executable(nqwcl WIN32 ${SOURCES} ${HEADERS})
 target_link_libraries(nqwcl
-        wsock32
-        ws2_32
+        $<$<PLATFORM_ID:Windows>:wsock32>
+        $<$<PLATFORM_ID:Windows>:ws2_32>
 
         OpenGL::GL
         Threads::Threads
