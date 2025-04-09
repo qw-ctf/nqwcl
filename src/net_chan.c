@@ -303,7 +303,6 @@ bool Netchan_Process (netchan_t *chan)
 {
 	unsigned		sequence, sequence_ack;
 	unsigned		reliable_ack, reliable_message;
-	int i;
 
 	if (
 			!cls.demoplayback && 

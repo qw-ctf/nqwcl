@@ -88,7 +88,7 @@ void Sys_Quit (void)
 int	Sys_FileTime (char *path)
 {
 	FILE	*f;
-	int		t, retval;
+	int		retval;
 
 	f = fopen(path, "rb");
 

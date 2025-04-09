@@ -699,9 +699,6 @@ Memory_Init
 */
 void Memory_Init (void *buf, int size)
 {
-	int p;
-	int zonesize = DYNAMIC_SIZE;
-
 	hunk_base = buf;
 	hunk_size = size;
 	hunk_low_used = 0;

@@ -314,9 +314,7 @@ void R_DrawSequentialPoly (msurface_t *s)
 	float		*v;
 	int			i;
 	texture_t	*t;
-	vec3_t		nv, dir;
-	float		ss, ss2, length;
-	float		s1, t1;
+	vec3_t		nv;
 	glRect_t	*theRect;
 
 	//
@@ -1307,7 +1305,6 @@ void BuildSurfaceDisplayList (msurface_t *fa)
 {
 	int			i, lindex, lnumverts;
 	medge_t		*pedges, *r_pedge;
-	int			vertpage;
 	float		*vec;
 	float		s, t;
 	glpoly_t	*poly;
@@ -1315,7 +1312,6 @@ void BuildSurfaceDisplayList (msurface_t *fa)
 // reconstruct the polygon
 	pedges = currentmodel->edges;
 	lnumverts = fa->numedges;
-	vertpage = 0;
 
 	//
 	// draw texture

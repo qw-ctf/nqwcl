@@ -150,17 +150,6 @@ bool	NET_StringToAdr (char *s, netadr_t *a)
 	return true;
 }
 
-// Returns true if we can't bind the address locally--in other words, 
-// the IP is NOT one of our interfaces.
-bool NET_IsClientLegal(netadr_t *adr)
-{
-	struct sockaddr_in sadr;
-	int newsocket;
-
-	return true;
-}
-
-
 //=============================================================================
 
 bool NET_GetPacket (void)

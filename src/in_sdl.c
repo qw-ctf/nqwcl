@@ -36,7 +36,7 @@ int			mouse_x, mouse_y, old_mouse_x, old_mouse_y;
 
 float mx_accum, my_accum;
 
-static bool	mouseparmsvalid, mouseactivatetoggle;
+static bool	mouseactivatetoggle;
 static bool	mouseshowtoggle = 1;
 
 bool	mouseactive;
@@ -282,8 +282,6 @@ IN_MouseMove
 */
 void IN_MouseMove (usercmd_t *cmd)
 {
-	static float old_mouse_x = 0, old_mouse_y = 0;
-
 	//
 	// Do not move the player if we're in HUD editor or menu mode.
 	// And don't apply ingame sensitivity, since that will make movements jerky.

@@ -37,6 +37,7 @@ else()
 
             $<$<CONFIG:Release>:-Werror=unused-function>
             $<$<CONFIG:Release>:-Werror=unused-variable>
+            $<$<CONFIG:Release>:-Werror=unused-but-set-variable>
     )
 
     check_c_compiler_flag("-Wstrlcpy-strlcat-size" HAS_STRLCPY_STRLCAT_SIZE)

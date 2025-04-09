@@ -233,7 +233,7 @@ Player is on ground, with no upwards velocity
 */
 void PM_GroundMove (void)
 {
-	vec3_t	start, dest;
+	vec3_t	dest;
 	pmtrace_t	trace;
 	vec3_t	original, originalvel, down, up, downvel;
 	float	downdist, updist;
@@ -248,7 +248,6 @@ void PM_GroundMove (void)
 	dest[2] = pmove.origin[2];
 
 	// first try moving directly to the next spot
-	VectorCopy (dest, start);
 	trace = PM_PlayerMove (pmove.origin, dest);
 	if (trace.fraction == 1)
 	{
@@ -775,14 +774,13 @@ SpectatorMove
 */
 void SpectatorMove (void)
 {
-	float	speed, drop, friction, control, newspeed, accel;
+	float	speed, drop, friction, control, newspeed;
 	float	currentspeed, addspeed, accelspeed;
 	int			i;
 	vec3_t		wishvel;
 	float		fmove, smove;
 	vec3_t		wishdir;
 	float		wishspeed;
-	extern float	server_version;	// version of server we connected to
 
 	// friction
 
