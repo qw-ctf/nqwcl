@@ -37,3 +37,13 @@ void IN_ModeChanged (void);
 // called whenever screen dimensions change
 
 void IN_SendKeyEvents(void);
+
+void IN_ShowMouse (void);
+
+void IN_HideMouse (void);
+
+void IN_ActivateMouse (void);
+
+void IN_DeactivateMouse (void);
+
+void IN_ClearStates (void);
